@@ -11,6 +11,20 @@ export interface Category {
   deleted: boolean;
 }
 
+export interface CategoryCreateRequest {
+  name: string;
+  type: TransactionType;
+  color: string;
+  sortOrder?: number;
+}
+
+// type은 생성 후 변경할 수 없으므로 필드 자체를 두지 않는다(CLAUDE.md 5장).
+export interface CategoryUpdateRequest {
+  name: string;
+  color: string;
+  sortOrder?: number;
+}
+
 export interface Transaction {
   id: number;
   type: TransactionType;
