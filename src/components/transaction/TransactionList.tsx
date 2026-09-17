@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+
 import { TransactionRow } from "@/components/transaction/TransactionRow";
 import { useDeleteTransactionMutation } from "@/hooks/useTransactions";
 import type { Transaction } from "@/types/transaction";
@@ -12,6 +14,7 @@ interface TransactionListProps {
 
 export function TransactionList({ transactions, onDeletedLastItem }: TransactionListProps) {
   const deleteMutation = useDeleteTransactionMutation();
+  const shouldReduceMotion = useReducedMotion();
 
   const handleDelete = (id: number) => {
     const wasLastItemOnPage = transactions.length === 1;
@@ -26,14 +29,25 @@ export function TransactionList({ transactions, onDeletedLastItem }: Transaction
 
   return (
     <div className="flex flex-col">
-      {transactions.map((transaction) => (
-        <TransactionRow
-          key={transaction.id}
-          transaction={transaction}
-          onDelete={handleDelete}
-          isDeleting={deleteMutation.isPending && deleteMutation.variables === transaction.id}
-        />
-      ))}
+      <AnimatePresence initial={false}>
+        {transactions.map((transaction, index) => (
+          <motion.div
+            key={transaction.id}
+            layout={!shouldReduceMotion}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0, transition: { delay: shouldReduceMotion ? 0 : index * 0.03 } }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <TransactionRow
+              transaction={transaction}
+              onDelete={handleDelete}
+              isDeleting={deleteMutation.isPending && deleteMutation.variables === transaction.id}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

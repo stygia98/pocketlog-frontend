@@ -1,5 +1,7 @@
 // div 너비를 %로 채우는 방식. 축·툴팁·범례가 필요 없어 라이브러리를 쓰지 않는다 (CLAUDE.md 3장).
 
+import { motion, useReducedMotion } from "motion/react";
+
 export type BudgetBarDatum = { name: string; spent: number; budget: number; color?: string };
 
 interface BudgetBarProps {
@@ -7,6 +9,8 @@ interface BudgetBarProps {
 }
 
 export function BudgetBar({ data }: BudgetBarProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <div className="flex flex-col gap-3">
       {data.map((d) => {
@@ -23,12 +27,13 @@ export function BudgetBar({ data }: BudgetBarProps) {
               </span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-              <div
+              {/* 차트 막대는 200ms 상한의 예외로 300ms를 쓴다(CLAUDE.md 8장). */}
+              <motion.div
                 className="h-full rounded-full"
-                style={{
-                  width: `${ratio * 100}%`,
-                  backgroundColor: exceeded ? "var(--expense)" : (d.color ?? "var(--primary)"),
-                }}
+                initial={shouldReduceMotion ? false : { width: 0 }}
+                animate={{ width: `${ratio * 100}%` }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.3 }}
+                style={{ backgroundColor: exceeded ? "var(--expense)" : (d.color ?? "var(--primary)") }}
               />
             </div>
           </div>
