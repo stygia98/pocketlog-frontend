@@ -3,12 +3,14 @@
 import type { MonthlyStats, Recurring } from "@/types/stats";
 import type { Transaction } from "@/types/transaction";
 
+// yearMonth("yyyy-MM")를 들고 있는 3종은 특정 월을 콕 집어 물어봤을 때(예: "9월", "2025년 9월")
+// 그 달을 가리킨다. 명시하지 않으면 파싱 시점에 현재 월로 채워진다 — "월 없음" 상태는 없다.
 export type ChatIntent =
   | { type: "help" }
-  | { type: "monthly_summary" }
-  | { type: "category_spend"; categoryId: number; categoryName: string }
+  | { type: "monthly_summary"; yearMonth: string }
+  | { type: "category_spend"; categoryId: number; categoryName: string; yearMonth: string }
   | { type: "recent_transactions" }
-  | { type: "budget_status" }
+  | { type: "budget_status"; yearMonth: string }
   | { type: "recurring" }
   | { type: "unknown" };
 

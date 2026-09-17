@@ -1,14 +1,14 @@
 // 의도별로 이미 불러온 데이터(ChatData)에서 필요한 값을 골라 문장으로 포맷한다.
 // 금액·날짜 포맷은 lib/money.ts·lib/date.ts만 쓴다(CLAUDE.md 3장·10장) — 새 포맷 함수를 추가하지 않는다.
 
-import { formatDate } from "@/lib/date";
+import { formatDate, formatYearMonth } from "@/lib/date";
 import { formatAmount, formatCompactAmount } from "@/lib/money";
 import type { ChatData, ChatIntent } from "@/types/chat";
 
 const HELP_LINES = [
   "이렇게 물어보실 수 있어요.",
-  '"이번달 지출 얼마야"',
-  '"식비 얼마 썼어" (카테고리 이름으로)',
+  '"이번달 지출 얼마야" / "9월 지출 얼마야" / "2025년 9월 지출 얼마야"',
+  '"식비 얼마 썼어" (카테고리 이름으로, 월을 붙여도 돼요)',
   '"최근 내역 보여줘"',
   '"예산 얼마 남았어"',
   '"고정지출 뭐있어"',
@@ -24,17 +24,20 @@ export function buildAnswer(intent: ChatIntent, data: ChatData): string[] {
     case "monthly_summary": {
       if (!data.stats) return LOADING;
       const { income, expense, net } = data.stats.summary;
-      return [`이번 달 총수입 ${formatAmount(income)}원, 총지출 ${formatAmount(expense)}원, 잔액 ${formatAmount(net)}원이에요.`];
+      return [
+        `${formatYearMonth(data.stats.yearMonth)} 총수입 ${formatAmount(income)}원, 총지출 ${formatAmount(expense)}원, 잔액 ${formatAmount(net)}원이에요.`,
+      ];
     }
 
     case "category_spend": {
       if (!data.stats) return LOADING;
+      const monthLabel = formatYearMonth(data.stats.yearMonth);
       const category = data.stats.byCategory.find((c) => c.categoryId === intent.categoryId);
       if (!category) {
-        return [`이번 달엔 ${intent.categoryName} 지출 내역이 없어요.`];
+        return [`${monthLabel}엔 ${intent.categoryName} 지출 내역이 없어요.`];
       }
       return [
-        `이번 달 ${category.name} 지출은 ${formatAmount(category.amount)}원이에요. (전체 지출의 ${Math.round(category.ratio * 100)}%)`,
+        `${monthLabel} ${category.name} 지출은 ${formatAmount(category.amount)}원이에요. (전체 지출의 ${Math.round(category.ratio * 100)}%)`,
       ];
     }
 
@@ -55,7 +58,7 @@ export function buildAnswer(intent: ChatIntent, data: ChatData): string[] {
       const budgeted = data.stats.budgets.filter((b) => b.budget > 0);
       if (budgeted.length === 0) return ["설정된 예산이 없어요."];
       return [
-        "이번 달 예산 소진율이에요.",
+        `${formatYearMonth(data.stats.yearMonth)} 예산 소진율이에요.`,
         ...budgeted.map((b) => {
           const ratio = Math.round(b.usageRatio * 100);
           const suffix = b.exceeded ? " — 초과!" : "";
