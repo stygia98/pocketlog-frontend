@@ -58,12 +58,7 @@ export default function DataPage() {
       </section>
 
       <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">가져오기</h2>
-          <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
-            양식 다운로드
-          </Button>
-        </div>
+        <h2 className="text-sm font-semibold">가져오기</h2>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
@@ -107,6 +102,9 @@ export default function DataPage() {
           />
           <Button onClick={handleImport} disabled={!file || importMutation.isPending}>
             {importMutation.isPending ? "가져오는 중..." : "가져오기"}
+          </Button>
+          <Button variant="outline" onClick={handleDownloadTemplate}>
+            양식 다운로드
           </Button>
         </div>
 
