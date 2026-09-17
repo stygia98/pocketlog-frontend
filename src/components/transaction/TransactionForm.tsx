@@ -79,32 +79,21 @@ export function TransactionForm({
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3" noValidate>
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1">
-            <Button
-              type="button"
-              variant={values.type === "EXPENSE" ? "default" : "outline"}
-              onClick={() => handleTypeChange("EXPENSE")}
-            >
-              지출
-            </Button>
-            <Button
-              type="button"
-              variant={values.type === "INCOME" ? "default" : "outline"}
-              onClick={() => handleTypeChange("INCOME")}
-            >
-              수입
-            </Button>
-          </div>
-
-          <Button type="submit" disabled={isSubmitDisabled}>
-            {isSubmitting ? "저장 중..." : submitLabel}
+        <div className="flex gap-1">
+          <Button
+            type="button"
+            variant={values.type === "EXPENSE" ? "default" : "outline"}
+            onClick={() => handleTypeChange("EXPENSE")}
+          >
+            지출
           </Button>
-          {showDeleteButton && (
-            <Button type="button" variant="outline" onClick={onDelete}>
-              삭제
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant={values.type === "INCOME" ? "default" : "outline"}
+            onClick={() => handleTypeChange("INCOME")}
+          >
+            수입
+          </Button>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
@@ -178,6 +167,17 @@ export function TransactionForm({
               value={values.memo}
               onChange={(event) => onChange({ ...values, memo: event.target.value })}
             />
+          </div>
+
+          <div className="flex gap-2">
+            <Button type="submit" disabled={isSubmitDisabled}>
+              {isSubmitting ? "저장 중..." : submitLabel}
+            </Button>
+            {showDeleteButton && (
+              <Button type="button" variant="outline" onClick={onDelete}>
+                삭제
+              </Button>
+            )}
           </div>
         </div>
       </form>
