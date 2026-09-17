@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   createTransaction,
@@ -9,7 +10,9 @@ import {
   listTransactions,
   updateTransaction,
 } from "@/lib/transactions";
+import { getErrorMessage } from "@/lib/errorMessages";
 import { queryKeys, type TransactionListParams } from "@/lib/queryKeys";
+import type { ApiRequestError } from "@/lib/apiClient";
 import type {
   PageResponse,
   Transaction,
@@ -74,7 +77,7 @@ interface DeleteContext {
 export function useDeleteTransactionMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, number, DeleteContext>({
+  return useMutation<void, ApiRequestError, number, DeleteContext>({
     mutationFn: (id: number) => deleteTransaction(id),
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.transactions.all() });
@@ -92,11 +95,15 @@ export function useDeleteTransactionMutation() {
 
       return { previousLists };
     },
-    onError: (_error, _id, context) => {
+    onError: (error, _id, context) => {
       context?.previousLists.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
       });
+      toast.error(getErrorMessage(error));
     },
-    onSettled: () => invalidateRelatedQueries(queryClient),
+    // onSettled(무조건 무효화)를 쓰면 서버가 다운된 상태에서 재조회까지 실패해, 방금 롤백한
+    // 목록이 화면째 ErrorState로 덮여 버린다(TXN-11 — 롤백된 항목이 보이지 않는 버그).
+    // 성공했을 때만 무효화해 서버 확정 데이터로 갱신한다.
+    onSuccess: () => invalidateRelatedQueries(queryClient),
   });
 }
