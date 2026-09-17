@@ -91,16 +91,20 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
     );
   }
 
+  const receiptButtonLabel = receiptParseMutation.isPending ? "인식 중..." : "영수증 첨부";
+
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <div className="mb-3 flex justify-end">
-        <input
-          ref={receiptInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleReceiptFileChange}
-        />
+      <input
+        ref={receiptInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleReceiptFileChange}
+      />
+
+      {/* 데스크톱: 카드 상단 우측. 모바일에서는 등록 버튼 옆(TransactionForm의 extraActions)에 둔다. */}
+      <div className="mb-3 hidden justify-end sm:flex">
         <Button
           type="button"
           variant="outline"
@@ -108,9 +112,10 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
           disabled={receiptParseMutation.isPending}
           onClick={() => receiptInputRef.current?.click()}
         >
-          {receiptParseMutation.isPending ? "인식 중..." : "영수증 첨부"}
+          {receiptButtonLabel}
         </Button>
       </div>
+
       <TransactionForm
         idPrefix="quick-add"
         values={values}
@@ -120,6 +125,17 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
         isSubmitting={createMutation.isPending}
         serverError={serverError}
         onSubmit={handleSubmit}
+        extraActions={
+          <Button
+            type="button"
+            variant="outline"
+            className="sm:hidden"
+            disabled={receiptParseMutation.isPending}
+            onClick={() => receiptInputRef.current?.click()}
+          >
+            {receiptButtonLabel}
+          </Button>
+        }
       />
     </div>
   );

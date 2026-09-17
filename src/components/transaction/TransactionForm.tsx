@@ -37,6 +37,8 @@ interface TransactionFormProps {
   onDelete?: () => void;
   /** 같은 페이지에 이 폼이 여러 번 렌더될 일은 없지만, input id 충돌을 막기 위해 접두사를 받는다. */
   idPrefix?: string;
+  /** 제출 버튼 옆에 추가로 둘 버튼(예: 퀵 입력 바의 영수증 첨부). 이 컴포넌트는 내용을 모른다. */
+  extraActions?: React.ReactNode;
 }
 
 export function TransactionForm({
@@ -50,6 +52,7 @@ export function TransactionForm({
   showDeleteButton,
   onDelete,
   idPrefix = "transaction-form",
+  extraActions,
 }: TransactionFormProps) {
   const categoryOptions = categories.filter((c) => c.type === values.type && !c.deleted);
 
@@ -178,6 +181,7 @@ export function TransactionForm({
                 삭제
               </Button>
             )}
+            {extraActions}
           </div>
         </div>
       </form>
