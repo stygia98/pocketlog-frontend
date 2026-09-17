@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TransactionForm, type TransactionFormValues } from "@/components/transaction/TransactionForm";
 import { useCategoriesQuery } from "@/hooks/useCategories";
 import {
@@ -79,8 +80,22 @@ export default function TransactionDetailPage() {
     );
   }
 
+  // 스피너 대신 스켈레톤을 쓴다(CLAUDE.md 9장) — TransactionForm과 같은 필드 배치로 만들어
+  // 로딩이 끝났을 때 레이아웃이 튀지 않게 한다.
   if (!values || !categoriesQuery.data) {
-    return <p className="text-sm text-muted-foreground">불러오는 중...</p>;
+    return (
+      <div className="flex flex-col gap-4" role="status" aria-label="불러오는 중">
+        <Skeleton className="h-7 w-24" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-8 w-36" />
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-8 flex-1" />
+        </div>
+      </div>
+    );
   }
 
   const handleSubmit = async () => {
