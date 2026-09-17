@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
+import { useRouter } from "next/navigation";
 
 import { AnomalyCard } from "@/components/dashboard/AnomalyCard";
 import { BudgetUsage } from "@/components/dashboard/BudgetUsage";
@@ -17,6 +18,7 @@ import { useMonthlyStatsQuery } from "@/hooks/useStats";
 import { todayString } from "@/lib/date";
 
 function DashboardPageContent() {
+  const router = useRouter();
   const { yearMonth, goPrev, goNext, canGoNext } = useDashboardMonth();
   // 서버는 UTC로 돌고 사용자는 KST라, "오늘"은 서버가 아니라 클라이언트가 계산해 보낸다(CLAUDE.md 4장).
   const asOf = todayString();
@@ -69,7 +71,10 @@ function DashboardPageContent() {
         <BudgetUsage budgets={stats.budgets} />
       </div>
 
-      <DailyHeatmap daily={stats.daily} />
+      <DailyHeatmap
+        daily={stats.daily}
+        onSelectDate={(date) => router.push(`/transactions?from=${date}&to=${date}`)}
+      />
     </div>
   );
 }

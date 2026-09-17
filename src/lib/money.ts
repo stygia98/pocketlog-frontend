@@ -14,3 +14,14 @@ export function formatAmount(value: number | string): string {
   if (!Number.isFinite(numeric)) return "";
   return numeric.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
 }
+
+/**
+ * 히트맵처럼 좁은 칸에 넣는 압축 표시용. 0이면 "0원", 만원 미만이면 그대로,
+ * 그 이상이면 "5.5만"처럼 만 단위 소수 첫째 자리로 줄인다(정수면 소수점을 생략).
+ */
+export function formatCompactAmount(value: number): string {
+  if (!Number.isFinite(value) || value === 0) return "0원";
+  if (value < 10000) return `${formatAmount(value)}원`;
+  const man = Math.round((value / 10000) * 10) / 10;
+  return `${Number.isInteger(man) ? man.toFixed(0) : man.toFixed(1)}만`;
+}
