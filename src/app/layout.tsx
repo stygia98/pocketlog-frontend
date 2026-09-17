@@ -14,7 +14,7 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "머니로그",
+  title: "포켓로그",
   description: "데이터 예측 기반 개인용 스마트 가계부",
 };
 

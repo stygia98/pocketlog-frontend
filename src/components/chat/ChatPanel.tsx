@@ -111,7 +111,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   return (
     <div className="flex h-[28rem] w-80 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl sm:w-96">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <p className="text-sm font-semibold">머니로그 도우미</p>
+        <p className="text-sm font-semibold">포켓로그 도우미</p>
         <button
           type="button"
           onClick={onClose}
