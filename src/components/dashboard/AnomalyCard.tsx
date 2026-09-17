@@ -35,7 +35,7 @@ export function AnomalyCard({ anomalies }: AnomalyCardProps) {
               aria-hidden
             />
             <span>
-              {anomaly.name}이(가) 평소보다 {Math.round(Math.abs(anomaly.deltaRatio) * 100)}%{" "}
+              {anomaly.name}이(가) 평소보다 <strong>{Math.round(Math.abs(anomaly.deltaRatio) * 100)}%</strong>{" "}
               {anomaly.deltaRatio >= 0 ? "높아요" : "낮아요"}
             </span>
           </li>
