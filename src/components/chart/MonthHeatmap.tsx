@@ -55,11 +55,11 @@ export function MonthHeatmap({ data, onSelectDate }: MonthHeatmapProps) {
               backgroundColor: tier === 0 ? "#ffffff" : INTENSITY_COLORS[tier - 1],
             }}
           >
-            <span className="text-xs leading-none text-muted-foreground">{getDate(parseISO(d.date))}</span>
-            <span className="text-[11px] leading-tight" style={{ color: "var(--income)" }}>
+            <span className="text-lg font-semibold leading-none text-muted-foreground">{getDate(parseISO(d.date))}</span>
+            <span className="text-[15px] font-bold leading-tight" style={{ color: "var(--income)" }}>
               {formatCompactAmount(d.income)}
             </span>
-            <span className="text-[11px] leading-tight" style={{ color: "var(--expense)" }}>
+            <span className="text-[15px] font-bold leading-tight" style={{ color: "var(--expense)" }}>
               {formatCompactAmount(d.expense)}
             </span>
           </button>
