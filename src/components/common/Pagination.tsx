@@ -11,12 +11,12 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-// CLAUDE.md 9장: 현재 페이지 주변 5개 + 처음/이전/다음/마지막. 페이지 수 1 이하면 렌더링하지 않음.
+// CLAUDE.md 9장: 현재 페이지 주변 10개 + 처음/이전/다음/마지막. 페이지 수 1 이하면 렌더링하지 않음.
 // 모바일은 "3 / 12" 형태로 축약.
 export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const windowSize = 5;
+  const windowSize = 10;
   const windowStart = Math.max(0, Math.min(currentPage - 2, totalPages - windowSize));
   const windowEnd = Math.min(totalPages, windowStart + windowSize);
   const pages = Array.from({ length: windowEnd - windowStart }, (_, i) => windowStart + i);
