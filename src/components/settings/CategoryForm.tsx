@@ -82,22 +82,28 @@ export function CategoryForm({
 
       <div className="flex flex-col gap-1">
         <Label htmlFor={`${idPrefix}-color`}>색</Label>
-        <div className="flex items-center gap-2">
-          <span
-            className="h-7 w-7 shrink-0 rounded-full border border-border"
-            style={{ backgroundColor: isColorValid ? values.color : "transparent" }}
-            aria-hidden
-          />
-          <Input
-            id={`${idPrefix}-color`}
-            type="text"
-            placeholder="#RRGGBB"
-            className="w-28 uppercase"
-            value={values.color}
-            onChange={(event) => onChange({ ...values, color: event.target.value })}
-            aria-invalid={values.color.length > 0 && !isColorValid}
-          />
+        <div className="flex flex-wrap gap-2">
+          {CATEGORY_PALETTE.map((color) => (
+            <button
+              key={color}
+              type="button"
+              aria-label={color}
+              onClick={() => onChange({ ...values, color })}
+              className={`h-7 w-7 rounded-full ${
+                values.color.toUpperCase() === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-popover" : ""
+              }`}
+              style={{ backgroundColor: color }}
+            />
+          ))}
         </div>
+        <Input
+          id={`${idPrefix}-color`}
+          type="text"
+          className="mt-1 w-28 uppercase"
+          value={values.color}
+          onChange={(event) => onChange({ ...values, color: event.target.value })}
+          aria-invalid={values.color.length > 0 && !isColorValid}
+        />
         {values.color.length > 0 && !isColorValid && (
           <p className="text-sm text-destructive">#RRGGBB 형식으로 입력해 주세요.</p>
         )}
