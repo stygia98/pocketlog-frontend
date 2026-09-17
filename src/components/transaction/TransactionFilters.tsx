@@ -95,14 +95,14 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
         </Select>
       </div>
 
-      <form onSubmit={handleKeywordSubmit} className="flex flex-col gap-1">
+      <form onSubmit={handleKeywordSubmit} className="flex min-w-40 flex-1 flex-col gap-1">
         <Label htmlFor="filter-keyword">검색</Label>
         <div className="flex gap-1">
           <Input
             id="filter-keyword"
             type="text"
             placeholder="거래처, 메모"
-            className="w-40"
+            className="flex-1"
             value={keywordInput}
             onChange={(event) => setKeywordInput(event.target.value)}
           />
