@@ -55,6 +55,11 @@ function DashboardPageContent() {
 
       <SummaryCards summary={stats.summary} />
 
+      <DailyHeatmap
+        daily={stats.daily}
+        onSelectDate={(date) => router.push(`/transactions?from=${date}&to=${date}`)}
+      />
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <ForecastCard forecast={stats.forecast} isPastMonth={isPastMonth} />
         <RecurringCard asOf={asOf} />
@@ -70,11 +75,6 @@ function DashboardPageContent() {
         <CategoryBreakdown byCategory={stats.byCategory} />
         <BudgetUsage budgets={stats.budgets} />
       </div>
-
-      <DailyHeatmap
-        daily={stats.daily}
-        onSelectDate={(date) => router.push(`/transactions?from=${date}&to=${date}`)}
-      />
     </div>
   );
 }
