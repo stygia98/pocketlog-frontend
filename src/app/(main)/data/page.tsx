@@ -23,6 +23,18 @@ export default function DataPage() {
     importMutation.mutate(file);
   };
 
+  // BOM을 붙여야 엑셀에서 한글이 깨지지 않는다(CLAUDE.md 5장 CSV 내보내기 규칙과 동일).
+  const handleDownloadTemplate = () => {
+    const csv =
+      "﻿날짜,구분,카테고리,금액,거래처,메모\n2026-09-14,지출,식비,12500,스타벅스 강남점,팀 미팅\n";
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "포켓로그_가져오기_양식.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
@@ -46,7 +58,12 @@ export default function DataPage() {
       </section>
 
       <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-        <h2 className="text-sm font-semibold">가져오기</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold">가져오기</h2>
+          <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
+            양식 다운로드
+          </Button>
+        </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
