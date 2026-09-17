@@ -7,9 +7,18 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { ListSkeleton } from "@/components/common/Skeleton";
 import { MonthNavigator } from "@/components/common/MonthNavigator";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useBudgetMonth } from "@/hooks/useBudgetMonth";
 import { useBudgetsQuery, useUpsertBudgetsMutation } from "@/hooks/useBudgets";
+import { formatYearMonth } from "@/lib/date";
 import { formatAmount, parseAmount } from "@/lib/money";
 
 // categoryId -> 입력창에 든 콤마 없는 원본 문자열. 서버가 null로 내려준 미설정 항목은 빈 문자열로 둔다.
@@ -20,6 +29,7 @@ function BudgetsPageContent() {
   const budgetsQuery = useBudgetsQuery(yearMonth);
   const upsertMutation = useUpsertBudgetsMutation(yearMonth);
   const [draft, setDraft] = useState<Draft>({});
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // 월을 이동하거나 최초 로드되면 서버 값으로 입력창을 다시 채운다.
   useEffect(() => {
@@ -51,13 +61,14 @@ function BudgetsPageContent() {
 
   const items = budgetsQuery.data ?? [];
 
-  const handleSave = () => {
+  const handleConfirmSave = () => {
     upsertMutation.mutate(
       items.map((item) => ({
         categoryId: item.categoryId,
         amount: draft[item.categoryId] ? Number(draft[item.categoryId]) : null,
       })),
     );
+    setShowConfirm(false);
   };
 
   return (
@@ -106,11 +117,26 @@ function BudgetsPageContent() {
           {upsertMutation.isError && (
             <p className="text-sm text-destructive">저장하지 못했어요. 다시 시도해 주세요.</p>
           )}
-          <Button onClick={handleSave} disabled={upsertMutation.isPending}>
+          <Button onClick={() => setShowConfirm(true)} disabled={upsertMutation.isPending}>
             {upsertMutation.isPending ? "저장 중..." : "저장"}
           </Button>
         </div>
       )}
+
+      <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{formatYearMonth(yearMonth)}의 예산으로 확정하시겠습니까?</DialogTitle>
+            <DialogDescription>확인을 누르면 변경한 금액으로 저장됩니다.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirm(false)}>
+              취소
+            </Button>
+            <Button onClick={handleConfirmSave}>확인</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
