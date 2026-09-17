@@ -30,10 +30,12 @@ export function TransactionRow({ transaction, onDelete, isDeleting }: Transactio
       >
         <span className="w-24 shrink-0 text-sm text-muted-foreground">{formatDate(transaction.txnDate)}</span>
         {/* 카테고리 이름 텍스트는 색 위가 아니라 점 옆에 둔다 — 사용자 지정 색이라 대비를 계산할 수 없다(PRD.md 5.1). */}
-        <span className="flex shrink-0 items-center gap-1.5 text-sm">
+        <span className="flex w-28 shrink-0 items-center gap-1.5 text-sm">
           <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: dotColor }} aria-hidden />
-          {category.name}
-          {category.deleted && <span className="text-muted-foreground">(삭제됨)</span>}
+          <span className="truncate">
+            {category.name}
+            {category.deleted && <span className="text-muted-foreground">(삭제됨)</span>}
+          </span>
         </span>
         <span className="min-w-0 flex-1 truncate text-sm">{transaction.merchant}</span>
       </Link>
