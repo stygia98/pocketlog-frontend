@@ -15,15 +15,16 @@ interface MonthHeatmapProps {
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-// 파스텔 4단계 — 최고 단계도 --expense 40%까지만 섞어 채도를 낮게 유지한다.
-const INTENSITY_MIX_PERCENT = [15, 27, 40] as const;
+// 파스텔 4단계(스카이블루). 활동이 없는 날(0원/0원)은 이 배열이 아니라 흰색으로 따로 처리한다.
+const INTENSITY_COLORS = ["#EFF6FF", "#D6E9FF", "#B3D7FF", "#8AC0FF"] as const;
 
 function intensityTier(expense: number, max: number): number {
   if (expense <= 0) return 0;
   const ratio = expense / max;
-  if (ratio <= 1 / 3) return 1;
-  if (ratio <= 2 / 3) return 2;
-  return 3;
+  if (ratio <= 0.25) return 1;
+  if (ratio <= 0.5) return 2;
+  if (ratio <= 0.75) return 3;
+  return 4;
 }
 
 export function MonthHeatmap({ data, onSelectDate }: MonthHeatmapProps) {
@@ -51,15 +52,14 @@ export function MonthHeatmap({ data, onSelectDate }: MonthHeatmapProps) {
             title={`${d.date}: 수입 ${formatCompactAmount(d.income)} · 지출 ${formatCompactAmount(d.expense)}`}
             className="flex aspect-square flex-col gap-0.5 rounded-sm border border-border p-1 text-left transition-opacity hover:opacity-80"
             style={{
-              backgroundColor:
-                tier === 0 ? "var(--muted)" : `color-mix(in oklch, var(--expense) ${INTENSITY_MIX_PERCENT[tier - 1]}%, var(--muted))`,
+              backgroundColor: tier === 0 ? "#ffffff" : INTENSITY_COLORS[tier - 1],
             }}
           >
-            <span className="text-[10px] leading-none text-muted-foreground">{getDate(parseISO(d.date))}</span>
-            <span className="text-[9px] leading-tight" style={{ color: "var(--income)" }}>
+            <span className="text-xs leading-none text-muted-foreground">{getDate(parseISO(d.date))}</span>
+            <span className="text-[11px] leading-tight" style={{ color: "var(--income)" }}>
               {formatCompactAmount(d.income)}
             </span>
-            <span className="text-[9px] leading-tight" style={{ color: "var(--expense)" }}>
+            <span className="text-[11px] leading-tight" style={{ color: "var(--expense)" }}>
               {formatCompactAmount(d.expense)}
             </span>
           </button>
