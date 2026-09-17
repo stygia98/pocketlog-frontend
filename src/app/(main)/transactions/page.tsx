@@ -14,7 +14,7 @@ import { useCategoriesQuery } from "@/hooks/useCategories";
 import { useTransactionFilters } from "@/hooks/useTransactionFilters";
 import { useTransactionListQuery } from "@/hooks/useTransactions";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 15;
 
 function TransactionsPageContent() {
   const { filters, setFilter, resetFilters, hasActiveFilters } = useTransactionFilters();
