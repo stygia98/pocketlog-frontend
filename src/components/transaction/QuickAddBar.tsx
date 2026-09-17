@@ -12,8 +12,6 @@ import type { Category } from "@/types/transaction";
 
 interface QuickAddBarProps {
   categories: Category[];
-  /** 부모(/transactions 페이지)가 이미 로드된 목록 앞쪽에서 중복 제거해 뽑아 내려준다(TXN-03). */
-  recentCategoryIds: number[];
 }
 
 function createInitialValues(): TransactionFormValues {
@@ -27,15 +25,10 @@ function createInitialValues(): TransactionFormValues {
   };
 }
 
-export function QuickAddBar({ categories, recentCategoryIds }: QuickAddBarProps) {
+export function QuickAddBar({ categories }: QuickAddBarProps) {
   const [values, setValues] = useState<TransactionFormValues>(createInitialValues);
   const [serverError, setServerError] = useState<string | undefined>();
   const createMutation = useCreateTransactionMutation();
-
-  const recentCategories = recentCategoryIds
-    .map((id) => categories.find((c) => c.id === id))
-    .filter((c): c is Category => c !== undefined)
-    .slice(0, 3);
 
   const handleSubmit = async () => {
     if (values.categoryId === null) return;
@@ -69,22 +62,6 @@ export function QuickAddBar({ categories, recentCategoryIds }: QuickAddBarProps)
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      {recentCategories.length > 0 && (
-        <div className="mb-3 flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">최근 사용</span>
-          {recentCategories.map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              className="rounded-full border border-border px-2.5 py-1 text-xs hover:bg-muted"
-              // 카테고리는 구분(수입/지출)에 종속되므로 type도 함께 맞춰야 select에서 바로 보인다.
-              onClick={() => setValues((prev) => ({ ...prev, type: category.type, categoryId: category.id }))}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-      )}
       <TransactionForm
         idPrefix="quick-add"
         values={values}

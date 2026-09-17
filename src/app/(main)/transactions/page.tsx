@@ -49,14 +49,9 @@ function TransactionsPageContent() {
   const list = listQuery.data;
   if (!list) return null;
 
-  // 최근 사용 카테고리는 별도 API 없이 이미 로드된 이 목록에서 중복 제거해 뽑는다(TXN-03).
-  // 여기서는 3개로 자르지 않는다 — 그 중 일부가 삭제된 카테고리라 QuickAddBar에서 걸러지면
-  // 유효한 후보가 3개 미만으로 줄어든다. 최종 3개 자르기는 필터링 이후 QuickAddBar가 한다.
-  const recentCategoryIds = Array.from(new Set(list.content.map((t) => t.category.id)));
-
   return (
     <div className="flex flex-col gap-6">
-      <QuickAddBar categories={categories} recentCategoryIds={recentCategoryIds} />
+      <QuickAddBar categories={categories} />
       <TransactionFilters categories={categories} />
 
       {list.totalElements === 0 ? (
