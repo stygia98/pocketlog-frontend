@@ -2,6 +2,8 @@
 // 모양으로 고정해 둔다 — 나중에 축·툴팁·줌 중 둘 이상이 필요해지면 이 파일 내부만 recharts로
 // 바꾸고 화면 코드는 건드리지 않는다 (CLAUDE.md 3장).
 
+import { formatAmount } from "@/lib/money";
+
 export type ChartDatum = { name: string; value: number; color?: string };
 
 // 색 미지정 시 배정하는 순서 (CLAUDE.md 8장 카테고리 팔레트, globals.css --color-category-* 와 동일).
@@ -68,6 +70,15 @@ export function CategoryDonut({ data, size = 160, strokeWidth = 24 }: CategoryDo
           );
         })}
       </g>
+
+      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central">
+        <tspan x={size / 2} dy="-0.6em" fontSize="11" fill="var(--color-muted-foreground)">
+          총 지출
+        </tspan>
+        <tspan x={size / 2} dy="1.4em" fontSize="15" fontWeight="600" fill="var(--color-foreground)">
+          {formatAmount(total)}
+        </tspan>
+      </text>
     </svg>
   );
 }
