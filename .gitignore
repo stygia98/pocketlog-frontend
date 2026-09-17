@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# .env*만 쓰면 .env.example까지 무시되므로 예외 줄이 반드시 필요하다
+!.env.example
 
 # vercel
 .vercel
