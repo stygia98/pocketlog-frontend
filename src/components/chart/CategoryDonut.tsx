@@ -71,13 +71,16 @@ export function CategoryDonut({ data, size = 160, strokeWidth = 24 }: CategoryDo
         })}
       </g>
 
-      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central">
-        <tspan x={size / 2} dy="-0.6em" fontSize="11" fill="var(--color-muted-foreground)">
-          총 지출
-        </tspan>
-        <tspan x={size / 2} dy="1.4em" fontSize="15" fontWeight="600" fill="var(--color-foreground)">
-          {formatAmount(total)}
-        </tspan>
+      <text
+        x={size / 2}
+        y={size / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize="16"
+        fontWeight="600"
+        fill="var(--color-foreground)"
+      >
+        {formatAmount(total)}
       </text>
     </svg>
   );
