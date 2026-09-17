@@ -125,7 +125,7 @@ export function TransactionForm({
                 onChange({ ...values, categoryId: Number(value) });
               }}
             >
-              <SelectTrigger id={`${idPrefix}-category`} className="sm:w-36">
+              <SelectTrigger id={`${idPrefix}-category`} className="w-full sm:w-36">
                 <SelectValue placeholder="카테고리 선택" />
               </SelectTrigger>
               <SelectContent>

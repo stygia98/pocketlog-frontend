@@ -33,13 +33,13 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-end gap-3">
+    <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
       <div className="flex flex-col gap-1">
         <Label htmlFor="filter-from">시작일</Label>
         <Input
           id="filter-from"
           type="date"
-          className="w-40"
+          className="w-full sm:w-40"
           value={filters.from ?? ""}
           onChange={(event) => setFilter({ from: event.target.value || undefined })}
         />
@@ -50,7 +50,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
         <Input
           id="filter-to"
           type="date"
-          className="w-40"
+          className="w-full sm:w-40"
           value={filters.to ?? ""}
           onChange={(event) => setFilter({ to: event.target.value || undefined })}
         />
@@ -62,7 +62,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
           value={filters.type ?? ALL}
           onValueChange={(value) => setFilter({ type: value === ALL ? undefined : (value as TransactionType) })}
         >
-          <SelectTrigger id="filter-type" className="w-28">
+          <SelectTrigger id="filter-type" className="w-full sm:w-28">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -79,7 +79,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
           value={filters.categoryId !== undefined ? String(filters.categoryId) : ALL}
           onValueChange={(value) => setFilter({ categoryId: value === ALL ? undefined : Number(value) })}
         >
-          <SelectTrigger id="filter-category" className="w-32">
+          <SelectTrigger id="filter-category" className="w-full sm:w-32">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -95,7 +95,7 @@ export function TransactionFilters({ categories }: TransactionFiltersProps) {
         </Select>
       </div>
 
-      <form onSubmit={handleKeywordSubmit} className="flex min-w-40 flex-1 flex-col gap-1">
+      <form onSubmit={handleKeywordSubmit} className="col-span-2 flex flex-col gap-1 sm:min-w-40 sm:flex-1">
         <Label htmlFor="filter-keyword">검색</Label>
         <div className="flex gap-1">
           <Input
