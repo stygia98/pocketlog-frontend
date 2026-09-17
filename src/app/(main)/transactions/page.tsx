@@ -53,31 +53,33 @@ function TransactionsPageContent() {
     <div className="flex flex-col gap-6">
       <QuickAddBar categories={categories} />
 
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <TransactionFilters categories={categories} />
+      </div>
 
-        {list.totalElements === 0 ? (
-          hasActiveFilters ? (
-            <EmptyState
-              title="조건에 맞는 내역이 없어요"
-              action={
-                <Button variant="outline" onClick={resetFilters}>
-                  필터 초기화
-                </Button>
-              }
-            />
-          ) : (
-            <EmptyState title="아직 기록이 없어요" description="퀵 입력 바에서 첫 거래를 남겨보세요." />
-          )
+      {list.totalElements === 0 ? (
+        hasActiveFilters ? (
+          <EmptyState
+            title="조건에 맞는 내역이 없어요"
+            action={
+              <Button variant="outline" onClick={resetFilters}>
+                필터 초기화
+              </Button>
+            }
+          />
         ) : (
+          <EmptyState title="아직 기록이 없어요" description="퀵 입력 바에서 첫 거래를 남겨보세요." />
+        )
+      ) : (
+        <div className="rounded-xl border border-border bg-card p-4">
           <TransactionList
             transactions={list.content}
             onDeletedLastItem={() => {
               if (filters.page > 0) setFilter({ page: filters.page - 1 });
             }}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {list.totalElements > 0 && (
         <Pagination
