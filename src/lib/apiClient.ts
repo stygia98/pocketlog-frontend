@@ -76,13 +76,22 @@ function buildUrl(path: string, params?: QueryParams): string {
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const token = getToken();
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;
+
+  // multipart 업로드(CSV 가져오기)는 body로 FormData를 받는다 — Content-Type을 직접 정하지
+  // 않아야 브라우저가 boundary를 포함해 자동으로 채운다. 수동으로 넣으면 서버가 못 읽는다.
+  const isFormData = options.body instanceof FormData;
+  if (!isFormData) headers["Content-Type"] = "application/json";
 
   const response = await fetch(buildUrl(path, options.params), {
     method: options.method ?? "GET",
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body: isFormData
+      ? (options.body as FormData)
+      : options.body !== undefined
+        ? JSON.stringify(options.body)
+        : undefined,
   });
 
   const body = (await response.json()) as ApiResponseBody<T>;
@@ -103,9 +112,41 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return body.data;
 }
 
+export interface DownloadResult {
+  blob: Blob;
+  filename: string;
+}
+
+// GET /data/export 전용 — CLAUDE.md 5장의 유일한 ApiResponse 봉투 예외라 body를 JSON으로
+// 파싱하지 않고 CSV 바이트를 그대로 받는다.
+async function download(path: string, params?: QueryParams): Promise<DownloadResult> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const response = await fetch(buildUrl(path, params), { headers });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      clearToken();
+      if (typeof window !== "undefined") window.location.href = "/login";
+    }
+    throw new ApiRequestError("DOWNLOAD_FAILED", "파일을 내려받지 못했습니다.", response.status);
+  }
+
+  const blob = await response.blob();
+  // 서버가 CORS exposedHeaders에 Content-Disposition을 열어 둬야 브라우저에서 읽힌다(CLAUDE.md 6장).
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const filename = disposition.match(/filename="?([^"]+)"?/)?.[1] ?? "export.csv";
+
+  return { blob, filename };
+}
+
 export const apiClient = {
   get: <T>(path: string, params?: QueryParams) => request<T>(path, { method: "GET", params }),
   post: <T>(path: string, body?: unknown) => request<T>(path, { method: "POST", body }),
   put: <T>(path: string, body?: unknown) => request<T>(path, { method: "PUT", body }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  upload: <T>(path: string, formData: FormData) => request<T>(path, { method: "POST", body: formData }),
+  download,
 };

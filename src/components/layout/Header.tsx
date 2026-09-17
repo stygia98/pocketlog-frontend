@@ -2,19 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, Receipt, Settings, Wallet } from "lucide-react";
+import { FileSpreadsheet, LayoutDashboard, LogOut, Receipt, Settings, Wallet } from "lucide-react";
 
 import { useAuth, useMeQuery } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// /budgets, /settings/categories는 Phase 11 전까지 실제 화면이 없다 — 링크는 지금 두고
-// 도착 화면 확인은 Phase 11 DoD로 미룬다(ROADMAP.md Phase 8).
 const NAV_ITEMS = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
   { href: "/transactions", label: "내역", icon: Receipt },
   { href: "/budgets", label: "예산", icon: Wallet },
   { href: "/settings/categories", label: "설정", icon: Settings },
+  { href: "/data", label: "데이터", icon: FileSpreadsheet },
 ];
 
 export function Header() {
