@@ -16,6 +16,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   TRANSACTION_NOT_FOUND: "거래 내역을 찾을 수 없습니다.",
   CATEGORY_NOT_FOUND: "카테고리를 찾을 수 없습니다.",
   INVALID_CSV: "CSV 파일을 읽을 수 없습니다. 형식을 확인해 주세요.",
+  RECEIPT_PARSE_FAILED: "영수증을 읽지 못했어요. 직접 입력해 주세요.",
   INTERNAL_ERROR: DEFAULT_MESSAGE,
 };
 
