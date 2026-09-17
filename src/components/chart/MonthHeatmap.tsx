@@ -1,6 +1,6 @@
 // CSS grid-cols-7 + 배경색 단계. Recharts에는 이런 차트가 없어 처음부터 직접 구현한다 (CLAUDE.md 3장).
 
-import { getDay, parseISO } from "date-fns";
+import { getDate, getDay, parseISO } from "date-fns";
 
 import { formatAmount } from "@/lib/money";
 
@@ -26,14 +26,22 @@ export function MonthHeatmap({ data }: MonthHeatmapProps) {
           <div
             key={d.date}
             title={`${d.date}: ${formatAmount(d.value)}원`}
-            className="aspect-square rounded-sm border border-border"
+            className="relative aspect-square rounded-sm border border-border"
             style={{
               backgroundColor:
                 intensity === 0
                   ? "var(--muted)"
                   : `color-mix(in oklch, var(--expense) ${Math.round(intensity * 100)}%, var(--muted))`,
             }}
-          />
+          >
+            {/* 배경 농도가 칸마다 달라 고정 색으로는 대비가 깨진다 — mix-blend-mode로 배경과 무관하게 대비를 유지한다. */}
+            <span
+              className="absolute left-0.5 top-0 text-[10px] leading-none"
+              style={{ color: "white", mixBlendMode: "difference" }}
+            >
+              {getDate(parseISO(d.date))}
+            </span>
+          </div>
         );
       })}
     </div>
