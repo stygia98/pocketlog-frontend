@@ -96,6 +96,9 @@ export function useDeleteTransactionMutation() {
     // onSettled(무조건 무효화)를 쓰면 서버가 다운된 상태에서 재조회까지 실패해, 방금 롤백한
     // 목록이 화면째 ErrorState로 덮여 버린다(TXN-11 — 롤백된 항목이 보이지 않는 버그).
     // 성공했을 때만 무효화해 서버 확정 데이터로 갱신한다.
-    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
+    onSuccess: () => {
+      invalidateTransactionRelatedQueries(queryClient);
+      toast.success("삭제되었습니다");
+    },
   });
 }

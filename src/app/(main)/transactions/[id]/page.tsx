@@ -50,6 +50,7 @@ export default function TransactionDetailPage() {
   const [values, setValues] = useState<TransactionFormValues | null>(null);
   const [initialValues, setInitialValues] = useState<TransactionFormValues | null>(null);
   const [serverError, setServerError] = useState<string | undefined>();
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (transactionQuery.data) {
@@ -119,7 +120,8 @@ export default function TransactionDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleConfirmDelete = async () => {
+    setIsDeleteConfirmOpen(false);
     await deleteMutation.mutateAsync(id);
     router.push("/transactions");
   };
@@ -138,7 +140,7 @@ export default function TransactionDetailPage() {
         serverError={serverError}
         onSubmit={handleSubmit}
         showDeleteButton
-        onDelete={handleDelete}
+        onDelete={() => setIsDeleteConfirmOpen(true)}
       />
 
       <Button
@@ -162,6 +164,22 @@ export default function TransactionDetailPage() {
             </Button>
             <Button variant="destructive" onClick={handleConfirm}>
               나가기
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>삭제하시겠습니까?</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+              취소
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              확인
             </Button>
           </DialogFooter>
         </DialogContent>
