@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { exportCsv, importCsv, triggerDownload } from "@/lib/data";
+import { invalidateTransactionRelatedQueries } from "@/lib/queryKeys";
 
 export function useExportCsvMutation() {
   return useMutation({
@@ -17,10 +18,6 @@ export function useImportCsvMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (file: File) => importCsv(file),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["stats"] });
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
-    },
+    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
   });
 }

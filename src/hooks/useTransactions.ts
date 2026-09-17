@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -11,7 +11,7 @@ import {
   updateTransaction,
 } from "@/lib/transactions";
 import { getErrorMessage } from "@/lib/errorMessages";
-import { queryKeys, type TransactionListParams } from "@/lib/queryKeys";
+import { invalidateTransactionRelatedQueries, queryKeys, type TransactionListParams } from "@/lib/queryKeys";
 import type { ApiRequestError } from "@/lib/apiClient";
 import type {
   PageResponse,
@@ -19,14 +19,6 @@ import type {
   TransactionCreateRequest,
   TransactionUpdateRequest,
 } from "@/types/transaction";
-
-// 거래를 변경하면 거래 목록뿐 아니라 대시보드(stats)·예산(budgets) 캐시도 함께 무효화한다.
-// 두 화면이 아직 없어도(Phase10·11에서 만든다) 이 규칙을 지금 넣어 두면 나중에 빠뜨릴 일이 없다(CLAUDE.md 9장).
-function invalidateRelatedQueries(queryClient: QueryClient) {
-  queryClient.invalidateQueries({ queryKey: ["transactions"] });
-  queryClient.invalidateQueries({ queryKey: ["stats"] });
-  queryClient.invalidateQueries({ queryKey: ["budgets"] });
-}
 
 function isPageResponse(data: unknown): data is PageResponse<Transaction> {
   return (
@@ -57,7 +49,7 @@ export function useCreateTransactionMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: TransactionCreateRequest) => createTransaction(body),
-    onSuccess: () => invalidateRelatedQueries(queryClient),
+    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
   });
 }
 
@@ -65,7 +57,7 @@ export function useUpdateTransactionMutation(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: TransactionUpdateRequest) => updateTransaction(id, body),
-    onSuccess: () => invalidateRelatedQueries(queryClient),
+    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
   });
 }
 
@@ -104,6 +96,6 @@ export function useDeleteTransactionMutation() {
     // onSettled(무조건 무효화)를 쓰면 서버가 다운된 상태에서 재조회까지 실패해, 방금 롤백한
     // 목록이 화면째 ErrorState로 덮여 버린다(TXN-11 — 롤백된 항목이 보이지 않는 버그).
     // 성공했을 때만 무효화해 서버 확정 데이터로 갱신한다.
-    onSuccess: () => invalidateRelatedQueries(queryClient),
+    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
   });
 }

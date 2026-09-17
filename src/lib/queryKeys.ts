@@ -2,6 +2,8 @@
 // 하위 키는 상위 배열을 접두사로 포함하므로, invalidateQueries({ queryKey: queryKeys.stats.all() })처럼
 // 상위 키만 넘겨도 그 아래 모든 변형(예: 서로 다른 yearMonth의 stats.monthly)이 함께 무효화된다.
 
+import type { QueryClient } from "@tanstack/react-query";
+
 export interface TransactionListParams {
   page: number;
   size: number;
@@ -46,3 +48,11 @@ export const queryKeys = {
     me: () => ["auth", "me"] as const,
   },
 };
+
+// 거래·CSV 가져오기처럼 거래 데이터를 바꾸는 mutation은 전부 이 셋을 함께 무효화한다.
+// 대시보드(stats)·예산(budgets)이 거래 합계에 의존하므로 빠뜨리면 화면 간 숫자가 어긋난다(CLAUDE.md 9장).
+export function invalidateTransactionRelatedQueries(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
+  queryClient.invalidateQueries({ queryKey: queryKeys.stats.all() });
+  queryClient.invalidateQueries({ queryKey: ["budgets"] });
+}
