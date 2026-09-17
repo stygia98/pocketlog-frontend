@@ -50,7 +50,7 @@ export function MonthHeatmap({ data, onSelectDate }: MonthHeatmapProps) {
             type="button"
             onClick={() => onSelectDate?.(d.date)}
             title={`${d.date}: 수입 ${formatCompactAmount(d.income)} · 지출 ${formatCompactAmount(d.expense)}`}
-            className="flex aspect-square flex-col gap-0.5 rounded-sm border border-border p-1 text-left transition-opacity hover:opacity-80"
+            className="flex aspect-square cursor-pointer flex-col gap-0.5 rounded-sm border border-border p-1 text-left transition-opacity hover:opacity-80"
             style={{
               backgroundColor: tier === 0 ? "#ffffff" : INTENSITY_COLORS[tier - 1],
             }}
