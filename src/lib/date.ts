@@ -33,3 +33,9 @@ export function formatDateTime(isoUtc: string): string {
 export function formatDate(dateString: string): string {
   return format(parseISO(dateString), DATE_FORMAT);
 }
+
+/** yyyy-MM 문자열을 화면 표시용(예: 2026년 9월)으로 변환한다. 대시보드 월 선택 헤더에 쓴다. */
+export function formatYearMonth(yearMonth: string): string {
+  const [year, month] = yearMonth.split("-");
+  return `${year}년 ${Number(month)}월`;
+}
