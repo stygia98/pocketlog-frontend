@@ -10,6 +10,8 @@ interface MonthHeatmapProps {
   data: MonthHeatmapDatum[];
 }
 
+const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
+
 export function MonthHeatmap({ data }: MonthHeatmapProps) {
   const max = Math.max(1, ...data.map((d) => d.value));
   // 1일이 무슨 요일인지에 맞춰 앞쪽을 빈 칸으로 채워 실제 달력처럼 정렬한다.
@@ -17,6 +19,11 @@ export function MonthHeatmap({ data }: MonthHeatmapProps) {
 
   return (
     <div className="grid grid-cols-7 gap-1">
+      {WEEKDAY_LABELS.map((label) => (
+        <div key={label} className="pb-1 text-center text-xs text-muted-foreground">
+          {label}
+        </div>
+      ))}
       {Array.from({ length: leadingBlanks }).map((_, index) => (
         <div key={`blank-${index}`} aria-hidden />
       ))}
