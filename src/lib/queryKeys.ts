@@ -31,6 +31,9 @@ export const queryKeys = {
   transactions: {
     all: () => ["transactions"] as const,
     list: (params: TransactionListParams) => ["transactions", params] as const,
+    // 모바일 무한 스크롤 전용(useInfiniteQuery) — page는 pageParam이 대신 관리하므로 키에서 뺀다.
+    infiniteList: (params: Omit<TransactionListParams, "page">) =>
+      ["transactions", "infinite", params] as const,
     detail: (id: number) => ["transactions", id] as const,
   },
   categories: {

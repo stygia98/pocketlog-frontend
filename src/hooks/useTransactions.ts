@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -29,10 +29,26 @@ function isPageResponse(data: unknown): data is PageResponse<Transaction> {
   );
 }
 
-export function useTransactionListQuery(params: TransactionListParams) {
+export function useTransactionListQuery(params: TransactionListParams, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.transactions.list(params),
     queryFn: () => listTransactions(params),
+    enabled: options?.enabled,
+  });
+}
+
+// 모바일 전용 무한 스크롤(useIsMobile로 분기). 데스크톱 페이지네이션과 동시에 마운트하지 않도록
+// enabled로 켜고 끈다 — 두 방식이 같은 데이터를 중복으로 요청하는 걸 막는다.
+export function useInfiniteTransactionListQuery(
+  params: Omit<TransactionListParams, "page">,
+  options?: { enabled?: boolean }
+) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.transactions.infiniteList(params),
+    queryFn: ({ pageParam }) => listTransactions({ ...params, page: pageParam }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.page + 1),
+    enabled: options?.enabled,
   });
 }
 

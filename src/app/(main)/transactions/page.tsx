@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
+import { InfiniteScrollSentinel } from "@/components/common/InfiniteScrollSentinel";
 import { ListSkeleton } from "@/components/common/Skeleton";
 import { Pagination } from "@/components/common/Pagination";
 import { Button } from "@/components/ui/button";
@@ -11,17 +12,45 @@ import { QuickAddBar } from "@/components/transaction/QuickAddBar";
 import { TransactionFilters } from "@/components/transaction/TransactionFilters";
 import { TransactionList } from "@/components/transaction/TransactionList";
 import { useCategoriesQuery } from "@/hooks/useCategories";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { useTransactionFilters } from "@/hooks/useTransactionFilters";
-import { useTransactionListQuery } from "@/hooks/useTransactions";
+import { useInfiniteTransactionListQuery, useTransactionListQuery } from "@/hooks/useTransactions";
 
 const PAGE_SIZE = 15;
 
 function TransactionsPageContent() {
   const { filters, setFilter, resetFilters, hasActiveFilters } = useTransactionFilters();
+  const isMobile = useIsMobile();
   const categoriesQuery = useCategoriesQuery();
-  const listQuery = useTransactionListQuery({ ...filters, size: PAGE_SIZE });
 
-  const isEmptyWithoutFilters = listQuery.data?.totalElements === 0 && !hasActiveFilters;
+  const filtersWithoutPage = {
+    type: filters.type,
+    categoryId: filters.categoryId,
+    from: filters.from,
+    to: filters.to,
+    keyword: filters.keyword,
+  };
+
+  // 모바일(무한 스크롤)과 데스크톱(페이지네이션)은 동시에 마운트하지 않는다 — isMobile이
+  // 판정되기 전(null)에는 둘 다 꺼서 같은 데이터를 두 방식으로 중복 요청하지 않는다.
+  const pageQuery = useTransactionListQuery({ ...filters, size: PAGE_SIZE }, { enabled: isMobile === false });
+  const infiniteQuery = useInfiniteTransactionListQuery(
+    { ...filtersWithoutPage, size: PAGE_SIZE },
+    { enabled: isMobile === true }
+  );
+
+  const isLoading =
+    isMobile === null || categoriesQuery.isLoading || (isMobile ? infiniteQuery.isLoading : pageQuery.isLoading);
+  const isError = categoriesQuery.isError || (isMobile ? infiniteQuery.isError : pageQuery.isError);
+
+  const transactions = isMobile
+    ? (infiniteQuery.data?.pages.flatMap((page) => page.content) ?? [])
+    : (pageQuery.data?.content ?? []);
+  const totalElements = isMobile
+    ? (infiniteQuery.data?.pages[0]?.totalElements ?? 0)
+    : (pageQuery.data?.totalElements ?? 0);
+
+  const isEmptyWithoutFilters = !isLoading && totalElements === 0 && !hasActiveFilters;
 
   // 거래가 없는 계정은 퀵 입력 바로 바로 입력을 시작할 수 있게 금액 필드에 포커스를 옮긴다(UX-02).
   useEffect(() => {
@@ -30,24 +59,23 @@ function TransactionsPageContent() {
     }
   }, [isEmptyWithoutFilters]);
 
-  if (categoriesQuery.isLoading || listQuery.isLoading) {
+  if (isLoading) {
     return <ListSkeleton count={5} />;
   }
 
-  if (categoriesQuery.isError || listQuery.isError) {
+  if (isError) {
     return (
       <ErrorState
         onRetry={() => {
           categoriesQuery.refetch();
-          listQuery.refetch();
+          if (isMobile) infiniteQuery.refetch();
+          else pageQuery.refetch();
         }}
       />
     );
   }
 
   const categories = categoriesQuery.data ?? [];
-  const list = listQuery.data;
-  if (!list) return null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -57,7 +85,7 @@ function TransactionsPageContent() {
         <TransactionFilters categories={categories} />
       </div>
 
-      {list.totalElements === 0 ? (
+      {totalElements === 0 ? (
         hasActiveFilters ? (
           <EmptyState
             title="조건에 맞는 내역이 없어요"
@@ -73,18 +101,32 @@ function TransactionsPageContent() {
       ) : (
         <div className="rounded-xl border border-border bg-card p-4">
           <TransactionList
-            transactions={list.content}
+            transactions={transactions}
             onDeletedLastItem={() => {
-              if (filters.page > 0) setFilter({ page: filters.page - 1 });
+              if (!isMobile && filters.page > 0) setFilter({ page: filters.page - 1 });
             }}
           />
+          {isMobile && infiniteQuery.hasNextPage && (
+            <>
+              <InfiniteScrollSentinel
+                enabled={infiniteQuery.hasNextPage}
+                resetKey={infiniteQuery.data?.pages.length ?? 0}
+                onIntersect={() => {
+                  if (!infiniteQuery.isFetchingNextPage) infiniteQuery.fetchNextPage();
+                }}
+              />
+              {infiniteQuery.isFetchingNextPage && (
+                <p className="py-3 text-center text-sm text-muted-foreground">불러오는 중...</p>
+              )}
+            </>
+          )}
         </div>
       )}
 
-      {list.totalElements > 0 && (
+      {!isMobile && totalElements > 0 && (
         <Pagination
-          currentPage={list.page}
-          totalPages={list.totalPages}
+          currentPage={pageQuery.data?.page ?? 0}
+          totalPages={pageQuery.data?.totalPages ?? 0}
           onPageChange={(page) => setFilter({ page })}
         />
       )}
