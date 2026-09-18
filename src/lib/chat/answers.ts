@@ -3,18 +3,30 @@
 
 import { formatDate, formatYearMonth } from "@/lib/date";
 import { formatAmount, formatCompactAmount } from "@/lib/money";
-import type { ChatData, ChatIntent } from "@/types/chat";
+import type { ChatData, ChatIntent, TransactionsListFilters } from "@/types/chat";
 
 const HELP_LINES = [
   "이렇게 물어보실 수 있어요.",
-  '"이번달 지출 얼마야" / "9월 지출 얼마야" / "2025년 9월 지출 얼마야"',
+  '"이번달 지출 얼마야" / "지출만 얼마야" / "9월 수입 얼마야"',
   '"식비 얼마 썼어" (카테고리 이름으로, 월을 붙여도 돼요)',
-  '"최근 내역 보여줘"',
+  '"지출 내역 보여줘" / "이번주 수입 리스트" / "최근 7일 내역 10건"',
   '"예산 얼마 남았어"',
   '"고정지출 뭐있어"',
 ];
 
 const LOADING = ["아직 데이터를 불러오는 중이에요. 잠시만 기다려 주세요."];
+
+// 목록 답변 끝에 붙이는 딥링크. 챗봇 안에서 페이지네이션·정렬을 재구현하지 않고
+// 이미 있는 /transactions 화면으로 필터를 그대로 넘긴다(CLAUDE.md 5장 쿼리 파라미터와 동일한 이름).
+function buildTransactionsLink(filters: TransactionsListFilters): string {
+  const params = new URLSearchParams();
+  if (filters.type) params.set("type", filters.type);
+  if (filters.categoryId) params.set("categoryId", String(filters.categoryId));
+  if (filters.from) params.set("from", filters.from);
+  if (filters.to) params.set("to", filters.to);
+  const query = params.toString();
+  return query ? `/transactions?${query}` : "/transactions";
+}
 
 export function buildAnswer(intent: ChatIntent, data: ChatData): string[] {
   switch (intent.type) {
@@ -24,8 +36,12 @@ export function buildAnswer(intent: ChatIntent, data: ChatData): string[] {
     case "monthly_summary": {
       if (!data.stats) return LOADING;
       const { income, expense, net } = data.stats.summary;
+      const monthLabel = formatYearMonth(data.stats.yearMonth);
+      if (intent.metric === "expense") return [`${monthLabel} 총지출은 ${formatAmount(expense)}원이에요.`];
+      if (intent.metric === "income") return [`${monthLabel} 총수입은 ${formatAmount(income)}원이에요.`];
+      if (intent.metric === "net") return [`${monthLabel} 잔액은 ${formatAmount(net)}원이에요.`];
       return [
-        `${formatYearMonth(data.stats.yearMonth)} 총수입 ${formatAmount(income)}원, 총지출 ${formatAmount(expense)}원, 잔액 ${formatAmount(net)}원이에요.`,
+        `${monthLabel} 총수입 ${formatAmount(income)}원, 총지출 ${formatAmount(expense)}원, 잔액 ${formatAmount(net)}원이에요.`,
       ];
     }
 
@@ -41,15 +57,28 @@ export function buildAnswer(intent: ChatIntent, data: ChatData): string[] {
       ];
     }
 
-    case "recent_transactions": {
-      if (!data.recentTransactions) return LOADING;
-      if (data.recentTransactions.length === 0) return ["아직 등록된 거래가 없어요."];
+    case "transactions_list": {
+      if (!data.transactionsList) return LOADING;
+      const { filters } = intent;
+      const scopeLabel = [
+        filters.periodLabel,
+        filters.categoryName,
+        filters.type === "EXPENSE" ? "지출" : filters.type === "INCOME" ? "수입" : undefined,
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      if (data.transactionsList.length === 0) {
+        return [`${scopeLabel} 내역이 없어요.`];
+      }
+
       return [
-        "최근 거래 내역이에요.",
-        ...data.recentTransactions.map((t) => {
+        `${scopeLabel} 내역이에요.`,
+        ...data.transactionsList.map((t) => {
           const sign = t.type === "EXPENSE" ? "-" : "+";
           return `${formatDate(t.txnDate)} · ${t.category.name} · ${sign}${formatAmount(t.amount)}원`;
         }),
+        `전체 보기 → ${buildTransactionsLink(filters)}`,
       ];
     }
 

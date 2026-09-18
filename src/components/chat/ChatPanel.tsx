@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { Send } from "lucide-react";
 
@@ -11,7 +12,10 @@ import { useTransactionListQuery } from "@/hooks/useTransactions";
 import { buildAnswer } from "@/lib/chat/answers";
 import { parseIntent } from "@/lib/chat/intents";
 import { todayString, toYearMonthString } from "@/lib/date";
+import type { TransactionListParams } from "@/lib/queryKeys";
 import type { ChatData, ChatIntent, ChatMessage } from "@/types/chat";
+
+const DEFAULT_LIST_FILTERS: TransactionListParams = { page: 0, size: 5 };
 
 interface ChatPanelProps {
   onClose: () => void;
@@ -26,12 +30,20 @@ const WELCOME: ChatMessage = {
 const CHECKING_MESSAGE: ChatMessage = { id: "checking", role: "bot", lines: ["확인하고 있어요..."] };
 
 // yearMonth를 필요로 하는 3종 의도만 targetYearMonth 재조회 대상이다. 나머지(help·recurring·
-// recent_transactions)는 항상 현재 데이터로 즉시 답한다.
+// transactions_list)는 각자의 상태(listFilters 등)에 따로 반응한다.
 function needsMonthlyStats(intent: ChatIntent): intent is Extract<
   ChatIntent,
   { type: "monthly_summary" | "category_spend" | "budget_status" }
 > {
   return intent.type === "monthly_summary" || intent.type === "category_spend" || intent.type === "budget_status";
+}
+
+function needsTransactionsList(intent: ChatIntent): intent is Extract<ChatIntent, { type: "transactions_list" }> {
+  return intent.type === "transactions_list";
+}
+
+function toListParams(filters: Extract<ChatIntent, { type: "transactions_list" }>["filters"]): TransactionListParams {
+  return { page: 0, size: filters.size, type: filters.type, categoryId: filters.categoryId, from: filters.from, to: filters.to };
 }
 
 // 패널이 열려 있을 때만 마운트된다 — 여기서 부르는 4개 쿼리는 기존 화면들이 쓰던 훅을
@@ -45,30 +57,34 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   const currentYearMonth = toYearMonthString(new Date());
   // 질문에서 다른 달(예: "9월", "2025년 9월")을 언급하면 이 값을 그 달로 바꿔 다시 조회한다.
   const [targetYearMonth, setTargetYearMonth] = useState(currentYearMonth);
+  // "내역"류 질문이 요청한 필터. 기본값은 기존 "최근 5건" 동작과 같다.
+  const [listFilters, setListFilters] = useState<TransactionListParams>(DEFAULT_LIST_FILTERS);
   const [pendingIntent, setPendingIntent] = useState<ChatIntent | null>(null);
 
   const asOf = todayString();
 
   const categoriesQuery = useCategoriesQuery();
   const statsQuery = useMonthlyStatsQuery(targetYearMonth, asOf);
-  const recentTransactionsQuery = useTransactionListQuery({ page: 0, size: 5 });
+  const transactionsListQuery = useTransactionListQuery(listFilters);
   const recurringQuery = useRecurringQuery(asOf);
 
   const isReady =
     !categoriesQuery.isLoading &&
     !statsQuery.isLoading &&
-    !recentTransactionsQuery.isLoading &&
+    !transactionsListQuery.isLoading &&
     !recurringQuery.isLoading;
 
-  // targetYearMonth를 바꾼 직후엔 statsQuery가 아직 이전 달 데이터를 들고 있을 수 있다.
-  // 새 달 데이터가 도착하면(yearMonth 일치) 대기 중이던 질문에 답한다.
+  // targetYearMonth·listFilters를 바꾼 직후엔 해당 쿼리가 아직 이전 데이터를 들고 있을 수 있다.
+  // 각 쿼리는 자신의 상태(targetYearMonth/listFilters)에 바로 묶여 있으므로, isLoading이 꺼지는
+  // 시점의 data는 항상 "지금 기다리는 바로 그 요청"의 결과다.
   useEffect(() => {
     if (!pendingIntent) return;
-    if (statsQuery.isLoading || statsQuery.data?.yearMonth !== targetYearMonth) return;
+    if (needsMonthlyStats(pendingIntent) && (statsQuery.isLoading || statsQuery.data?.yearMonth !== targetYearMonth)) return;
+    if (needsTransactionsList(pendingIntent) && transactionsListQuery.isLoading) return;
 
     const data: ChatData = {
       stats: statsQuery.data,
-      recentTransactions: recentTransactionsQuery.data?.content,
+      transactionsList: transactionsListQuery.data?.content,
       recurring: recurringQuery.data,
     };
     setMessages((prev) => [
@@ -76,7 +92,15 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       { id: crypto.randomUUID(), role: "bot", lines: buildAnswer(pendingIntent, data) },
     ]);
     setPendingIntent(null);
-  }, [pendingIntent, statsQuery.data, statsQuery.isLoading, targetYearMonth, recentTransactionsQuery.data, recurringQuery.data]);
+  }, [
+    pendingIntent,
+    statsQuery.data,
+    statsQuery.isLoading,
+    targetYearMonth,
+    transactionsListQuery.data,
+    transactionsListQuery.isLoading,
+    recurringQuery.data,
+  ]);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -95,9 +119,21 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       return;
     }
 
+    if (needsTransactionsList(intent)) {
+      const requestedParams = toListParams(intent.filters);
+      if (JSON.stringify(requestedParams) !== JSON.stringify(listFilters)) {
+        // 다른 필터(기간·구분·카테고리·건수)를 물어봤다 — 그 조합을 다시 불러오는 동안 대기한다.
+        setListFilters(requestedParams);
+        setPendingIntent(intent);
+        setMessages((prev) => [...prev, userMessage, CHECKING_MESSAGE]);
+        setInput("");
+        return;
+      }
+    }
+
     const data: ChatData = {
       stats: statsQuery.data,
-      recentTransactions: recentTransactionsQuery.data?.content,
+      transactionsList: transactionsListQuery.data?.content,
       recurring: recurringQuery.data,
     };
     setMessages((prev) => [
@@ -130,9 +166,18 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
                 message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
               }`}
             >
-              {message.lines.map((line, index) => (
-                <p key={index}>{line}</p>
-              ))}
+              {message.lines.map((line, index) => {
+                // "전체 보기 → /transactions?..." 형태의 줄만 실제 링크로 바꾼다(buildTransactionsLink 참조).
+                const linkMatch = line.match(/^(.+) → (\/\S+)$/);
+                if (!linkMatch) return <p key={index}>{line}</p>;
+                return (
+                  <p key={index}>
+                    <Link href={linkMatch[2]} onClick={onClose} className="underline underline-offset-2">
+                      {linkMatch[1]}
+                    </Link>
+                  </p>
+                );
+              })}
             </div>
           </div>
         ))}
