@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileSpreadsheet, LayoutDashboard, LogOut, Receipt, Wallet } from "lucide-react";
+import { FileSpreadsheet, LayoutDashboard, LogOut, Moon, Receipt, Sun, Wallet } from "lucide-react";
 
 import { useAuth, useMeQuery } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
 export function Header() {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   // Header는 (main) 레이아웃이 authenticated로 판정한 뒤에만 렌더되므로 항상 활성화한다.
   const { data: user } = useMeQuery(true);
 
@@ -48,6 +50,14 @@ export function Header() {
           <div className="flex items-center gap-3">
             {/* 이메일은 UserResponse에 있어도 여기서 참조하지 않는다 — DOM에 아예 존재하면 안 된다(AUTH-08). */}
             {user && <span className="text-sm text-muted-foreground">{user.nickname}</span>}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "라이트 모드로 전환" : "다크 모드로 전환"}
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
             <Button variant="ghost" size="icon" onClick={logout} aria-label="로그아웃">
               <LogOut className="h-4 w-4" />
             </Button>

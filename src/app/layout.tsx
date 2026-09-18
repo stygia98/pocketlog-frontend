@@ -18,9 +18,17 @@ export const metadata: Metadata = {
   description: "데이터 예측 기반 개인용 스마트 가계부",
 };
 
+// 다크모드는 class 전략(.dark)을 쓴다. 하이드레이션 전에 동기 실행되는 이 스크립트가
+// localStorage에 저장된 선택값(없으면 시스템 선호)으로 <html>에 .dark를 미리 붙여, 라이트로
+// 그렸다가 다크로 바뀌는 FOUC를 막는다(useTheme 훅과 짝을 이룸).
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${pretendard.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <QueryProvider>{children}</QueryProvider>
       </body>
