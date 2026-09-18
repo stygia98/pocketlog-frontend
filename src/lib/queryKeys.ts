@@ -45,6 +45,7 @@ export const queryKeys = {
     recurring: (params: RecurringStatsParams) => ["stats", "recurring", params] as const,
   },
   budgets: {
+    root: () => ["budgets"] as const,
     all: (params: BudgetsParams) => ["budgets", params] as const,
   },
   auth: {
@@ -57,5 +58,5 @@ export const queryKeys = {
 export function invalidateTransactionRelatedQueries(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all() });
   queryClient.invalidateQueries({ queryKey: queryKeys.stats.all() });
-  queryClient.invalidateQueries({ queryKey: ["budgets"] });
+  queryClient.invalidateQueries({ queryKey: queryKeys.budgets.root() });
 }
