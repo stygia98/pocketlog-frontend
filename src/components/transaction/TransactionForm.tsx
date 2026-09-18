@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { MapPin, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LocationPickerDialog } from "@/components/transaction/LocationPickerDialog";
 import { formatAmount, parseAmount } from "@/lib/money";
 import type { Category, TransactionType } from "@/types/transaction";
 
@@ -23,6 +27,8 @@ export interface TransactionFormValues {
   categoryId: number | null;
   merchant: string;
   memo: string;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 interface TransactionFormProps {
@@ -54,6 +60,7 @@ export function TransactionForm({
   idPrefix = "transaction-form",
   extraActions,
 }: TransactionFormProps) {
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
   const categoryOptions = categories.filter((c) => c.type === values.type && !c.deleted);
 
   const handleTypeChange = (type: TransactionType) => {
@@ -151,14 +158,36 @@ export function TransactionForm({
 
           <div className="flex flex-col gap-1">
             <Label htmlFor={`${idPrefix}-merchant`} className="justify-center">거래처</Label>
-            <Input
-              id={`${idPrefix}-merchant`}
-              type="text"
-              maxLength={100}
-              className="sm:w-40"
-              value={values.merchant}
-              onChange={(event) => onChange({ ...values, merchant: event.target.value })}
-            />
+            <div className="flex items-center gap-1">
+              <Input
+                id={`${idPrefix}-merchant`}
+                type="text"
+                maxLength={100}
+                className="sm:w-40"
+                value={values.merchant}
+                onChange={(event) => onChange({ ...values, merchant: event.target.value })}
+              />
+              <Button
+                type="button"
+                variant={values.latitude !== null ? "default" : "outline"}
+                size="icon"
+                aria-label="위치 선택"
+                onClick={() => setIsLocationPickerOpen(true)}
+              >
+                <MapPin className="h-4 w-4" />
+              </Button>
+              {values.latitude !== null && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label="위치 지우기"
+                  onClick={() => onChange({ ...values, latitude: null, longitude: null })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-1 sm:min-w-40 sm:flex-1">
@@ -185,6 +214,19 @@ export function TransactionForm({
           </div>
         </div>
       </form>
+
+      <LocationPickerDialog
+        open={isLocationPickerOpen}
+        onOpenChange={setIsLocationPickerOpen}
+        onSelect={(location) =>
+          onChange({
+            ...values,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            merchant: location.name,
+          })
+        }
+      />
     </div>
   );
 }

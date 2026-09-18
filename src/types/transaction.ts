@@ -32,6 +32,8 @@ export interface Transaction {
   txnDate: string;
   merchant: string | null;
   memo: string | null;
+  latitude: number | null;
+  longitude: number | null;
   category: Category;
 }
 
@@ -42,6 +44,8 @@ export interface TransactionCreateRequest {
   categoryId: number;
   merchant?: string;
   memo?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 // PUT은 전체 교체다 — merchant/memo를 누락하면 서버가 null로 저장한다(CLAUDE.md 5장).

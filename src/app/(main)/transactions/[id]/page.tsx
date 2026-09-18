@@ -34,6 +34,8 @@ function toFormValues(transaction: Transaction): TransactionFormValues {
     categoryId: transaction.category.id,
     merchant: transaction.merchant ?? "",
     memo: transaction.memo ?? "",
+    latitude: transaction.latitude,
+    longitude: transaction.longitude,
   };
 }
 
@@ -110,6 +112,8 @@ export default function TransactionDetailPage() {
         categoryId: values.categoryId,
         merchant: values.merchant || undefined,
         memo: values.memo || undefined,
+        latitude: values.latitude ?? undefined,
+        longitude: values.longitude ?? undefined,
       });
       // 가드를 먼저 해제(초기값을 저장된 값으로 갱신)한 뒤 이동한다 — 순서를 바꾸면
       // router.push 도중 popstate/beforeunload가 여전히 dirty로 오판할 수 있다.

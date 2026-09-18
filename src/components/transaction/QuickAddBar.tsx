@@ -25,6 +25,8 @@ function createInitialValues(): TransactionFormValues {
     categoryId: null,
     merchant: "",
     memo: "",
+    latitude: null,
+    longitude: null,
   };
 }
 
@@ -46,6 +48,8 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
         categoryId: values.categoryId,
         merchant: values.merchant || undefined,
         memo: values.memo || undefined,
+        latitude: values.latitude ?? undefined,
+        longitude: values.longitude ?? undefined,
       });
       // 저장 성공 시 날짜·구분만 유지하고 나머지는 비운다(TXN-02, 연속 입력 대비).
       setValues((prev) => ({ ...createInitialValues(), type: prev.type, txnDate: prev.txnDate }));
@@ -74,6 +78,8 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
         categoryId: result.categoryId,
         merchant: result.merchant ?? "",
         memo: prev.memo,
+        latitude: prev.latitude,
+        longitude: prev.longitude,
       }));
     } catch (error) {
       toast.error(error instanceof ApiRequestError ? getErrorMessage(error) : "영수증을 읽지 못했어요. 직접 입력해 주세요.");

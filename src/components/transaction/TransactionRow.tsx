@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { MapPin, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { TransactionLocationDialog } from "@/components/transaction/TransactionLocationDialog";
 import { formatDate } from "@/lib/date";
 import { formatAmount } from "@/lib/money";
 import { cn } from "@/lib/utils";
@@ -16,6 +18,9 @@ interface TransactionRowProps {
 }
 
 export function TransactionRow({ transaction, onDelete, isDeleting }: TransactionRowProps) {
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const hasLocation = transaction.latitude !== null && transaction.longitude !== null;
+
   return (
     <div className="flex items-center justify-between gap-3 border-b border-border py-3 last:border-b-0">
       {/*
@@ -30,7 +35,25 @@ export function TransactionRow({ transaction, onDelete, isDeleting }: Transactio
         className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3"
       >
         <span className="text-sm text-muted-foreground sm:w-24 sm:shrink-0">{formatDate(transaction.txnDate)}</span>
-        <span className="min-w-0 truncate text-sm sm:flex-1">{transaction.merchant}</span>
+        <span className="flex min-w-0 items-center gap-1 sm:flex-1">
+          <span className="min-w-0 truncate text-sm">{transaction.merchant}</span>
+          {hasLocation && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 shrink-0"
+              aria-label="위치 보기"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setIsLocationOpen(true);
+              }}
+            >
+              <MapPin className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </span>
       </Link>
 
       <span
@@ -57,6 +80,16 @@ export function TransactionRow({ transaction, onDelete, isDeleting }: Transactio
       >
         <Trash2 className="h-4 w-4" />
       </Button>
+
+      {hasLocation && (
+        <TransactionLocationDialog
+          open={isLocationOpen}
+          onOpenChange={setIsLocationOpen}
+          label={transaction.merchant ?? "위치"}
+          latitude={transaction.latitude as number}
+          longitude={transaction.longitude as number}
+        />
+      )}
     </div>
   );
 }
