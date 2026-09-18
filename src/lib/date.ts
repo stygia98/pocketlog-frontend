@@ -40,6 +40,12 @@ export function daysAgoString(n: number): string {
   return toDateString(subDays(new Date(), n));
 }
 
+/** yyyy-MM 문자열에 개월 수(음수 가능)를 더한 새 yyyy-MM을 반환한다. 챗봇의 "지난달" 파싱에 쓴다. */
+export function shiftYearMonth(yearMonth: string, delta: number): string {
+  const [year, month] = yearMonth.split("-").map(Number);
+  return toYearMonthString(new Date(year, month - 1 + delta, 1));
+}
+
 /** yyyy-MM 문자열의 1일~말일을 from/to 구간으로 변환한다. */
 export function yearMonthToRange(yearMonth: string): { from: string; to: string } {
   const [year, month] = yearMonth.split("-").map(Number);

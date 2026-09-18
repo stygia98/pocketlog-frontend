@@ -9,11 +9,11 @@ import { Input } from "@/components/ui/input";
 import { useCategoriesQuery } from "@/hooks/useCategories";
 import { useMonthlyStatsQuery, useRecurringQuery } from "@/hooks/useStats";
 import { useTransactionListQuery } from "@/hooks/useTransactions";
-import { buildAnswer } from "@/lib/chat/answers";
+import { buildAnswer, LOAD_FAILED } from "@/lib/chat/answers";
 import { parseIntent } from "@/lib/chat/intents";
-import { todayString, toYearMonthString } from "@/lib/date";
+import { shiftYearMonth, todayString, toYearMonthString } from "@/lib/date";
 import type { TransactionListParams } from "@/lib/queryKeys";
-import type { ChatData, ChatIntent, ChatMessage } from "@/types/chat";
+import type { ChatData, ChatIntent, ChatMessage, TransactionsListFilters } from "@/types/chat";
 
 const DEFAULT_LIST_FILTERS: TransactionListParams = { page: 0, size: 5 };
 
@@ -24,26 +24,50 @@ interface ChatPanelProps {
 const WELCOME: ChatMessage = {
   id: "welcome",
   role: "bot",
-  lines: ["안녕하세요! 이번 달(또는 다른 달) 지출·수입, 카테고리별 지출, 최근 내역, 예산, 고정지출을 물어보세요."],
+  lines: ["안녕하세요! 지출·수입, 카테고리, 예상 지출, 지난달 비교, 거래처 검색, 예산, 고정지출을 물어보세요. \"도움\"이라고 치면 예시를 보여드려요."],
 };
 
 const CHECKING_MESSAGE: ChatMessage = { id: "checking", role: "bot", lines: ["확인하고 있어요..."] };
 
-// yearMonth를 필요로 하는 3종 의도만 targetYearMonth 재조회 대상이다. 나머지(help·recurring·
-// transactions_list)는 각자의 상태(listFilters 등)에 따로 반응한다.
-function needsMonthlyStats(intent: ChatIntent): intent is Extract<
-  ChatIntent,
-  { type: "monthly_summary" | "category_spend" | "budget_status" }
-> {
-  return intent.type === "monthly_summary" || intent.type === "category_spend" || intent.type === "budget_status";
+// 의도별로 답하기 전에 준비돼 있어야 하는 조회. 값이 현재 상태와 다르면 상태를 바꿔 다시 불러온다.
+interface Needs {
+  yearMonth?: string;
+  baseYearMonth?: string;
+  list?: TransactionListParams;
+  recurring?: boolean;
 }
 
-function needsTransactionsList(intent: ChatIntent): intent is Extract<ChatIntent, { type: "transactions_list" }> {
-  return intent.type === "transactions_list";
+function toListParams(filters: TransactionsListFilters): TransactionListParams {
+  return {
+    page: 0,
+    size: filters.size,
+    type: filters.type,
+    categoryId: filters.categoryId,
+    from: filters.from,
+    to: filters.to,
+    keyword: filters.keyword,
+  };
 }
 
-function toListParams(filters: Extract<ChatIntent, { type: "transactions_list" }>["filters"]): TransactionListParams {
-  return { page: 0, size: filters.size, type: filters.type, categoryId: filters.categoryId, from: filters.from, to: filters.to };
+function needsOf(intent: ChatIntent): Needs {
+  switch (intent.type) {
+    case "monthly_summary":
+    case "category_spend":
+    case "budget_status":
+    case "forecast":
+    case "anomalies":
+    case "top_categories":
+    case "daily_spend":
+      return { yearMonth: intent.yearMonth };
+    case "compare":
+      return { yearMonth: intent.yearMonth, baseYearMonth: intent.baseYearMonth };
+    case "transactions_list":
+      return { list: toListParams(intent.filters) };
+    case "recurring":
+      return { recurring: true };
+    default:
+      return {};
+  }
 }
 
 // 패널이 열려 있을 때만 마운트된다 — 여기서 부르는 4개 쿼리는 기존 화면들이 쓰던 훅을
@@ -55,9 +79,11 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   // 않은 질문의 기본 조회 대상이다 — targetYearMonth(직전에 조회한 달)를 쓰면 안 된다.
   // 그러면 "9월"만 물었을 때 직전에 봤던 달의 연도가 섞여 들어간다.
   const currentYearMonth = toYearMonthString(new Date());
-  // 질문에서 다른 달(예: "9월", "2025년 9월")을 언급하면 이 값을 그 달로 바꿔 다시 조회한다.
+  // 질문에서 다른 달(예: "9월", "지난달")을 언급하면 이 값을 그 달로 바꿔 다시 조회한다.
   const [targetYearMonth, setTargetYearMonth] = useState(currentYearMonth);
-  // "내역"류 질문이 요청한 필터. 기본값은 기존 "최근 5건" 동작과 같다.
+  // 비교 질문의 기준 달. 비교가 가장 흔히 묻는 "지난달"로 미리 받아둔다(대시보드가 이미 캐시했을 가능성도 높다).
+  const [baseYearMonth, setBaseYearMonth] = useState(() => shiftYearMonth(currentYearMonth, -1));
+  // 목록류 질문이 요청한 필터. 기본값은 "최근 5건".
   const [listFilters, setListFilters] = useState<TransactionListParams>(DEFAULT_LIST_FILTERS);
   const [pendingIntent, setPendingIntent] = useState<ChatIntent | null>(null);
 
@@ -65,41 +91,61 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
 
   const categoriesQuery = useCategoriesQuery();
   const statsQuery = useMonthlyStatsQuery(targetYearMonth, asOf);
+  const baseStatsQuery = useMonthlyStatsQuery(baseYearMonth, asOf);
   const transactionsListQuery = useTransactionListQuery(listFilters);
   const recurringQuery = useRecurringQuery(asOf);
 
   const isReady =
     !categoriesQuery.isLoading &&
     !statsQuery.isLoading &&
+    !baseStatsQuery.isLoading &&
     !transactionsListQuery.isLoading &&
     !recurringQuery.isLoading;
 
-  // targetYearMonth·listFilters를 바꾼 직후엔 해당 쿼리가 아직 이전 데이터를 들고 있을 수 있다.
-  // 각 쿼리는 자신의 상태(targetYearMonth/listFilters)에 바로 묶여 있으므로, isLoading이 꺼지는
-  // 시점의 data는 항상 "지금 기다리는 바로 그 요청"의 결과다.
+  const currentData = (): ChatData => ({
+    stats: statsQuery.data,
+    baseStats: baseStatsQuery.data,
+    transactionsList: transactionsListQuery.data?.content,
+    transactionsTotal: transactionsListQuery.data?.totalElements,
+    recurring: recurringQuery.data,
+  });
+
+  // R4-10. 필요한 조회 중 하나라도 실패했으면 대기하지 않고 실패로 끝낸다.
+  const hasFailed = (needs: Needs) =>
+    (needs.yearMonth !== undefined && statsQuery.isError) ||
+    (needs.baseYearMonth !== undefined && baseStatsQuery.isError) ||
+    (needs.list !== undefined && transactionsListQuery.isError) ||
+    (needs.recurring === true && recurringQuery.isError);
+
+  const answer = (intent: ChatIntent): string[] => (hasFailed(needsOf(intent)) ? LOAD_FAILED : buildAnswer(intent, currentData()));
+
+  // 상태를 바꾼 직후엔 쿼리가 새 키로 넘어가 data가 비거나 이전 달 값이다. 필요한 값이
+  // "바로 그 달·그 필터"의 결과가 됐을 때만 답한다 — yearMonth는 응답에 실려 오므로 직접 대조한다.
   useEffect(() => {
     if (!pendingIntent) return;
-    if (needsMonthlyStats(pendingIntent) && (statsQuery.isLoading || statsQuery.data?.yearMonth !== targetYearMonth)) return;
-    if (needsTransactionsList(pendingIntent) && transactionsListQuery.isLoading) return;
-
-    const data: ChatData = {
-      stats: statsQuery.data,
-      transactionsList: transactionsListQuery.data?.content,
-      recurring: recurringQuery.data,
-    };
+    const needs = needsOf(pendingIntent);
+    if (!hasFailed(needs)) {
+      if (needs.yearMonth && statsQuery.data?.yearMonth !== needs.yearMonth) return;
+      if (needs.baseYearMonth && baseStatsQuery.data?.yearMonth !== needs.baseYearMonth) return;
+      if (needs.list && (transactionsListQuery.isLoading || !transactionsListQuery.data)) return;
+    }
     setMessages((prev) => [
       ...prev.slice(0, -1), // "확인하고 있어요..." 자리를 실제 답으로 교체
-      { id: crypto.randomUUID(), role: "bot", lines: buildAnswer(pendingIntent, data) },
+      { id: crypto.randomUUID(), role: "bot", lines: answer(pendingIntent) },
     ]);
     setPendingIntent(null);
+    // answer/hasFailed는 아래 쿼리 상태에서 파생되므로 그 상태들만 의존성으로 둔다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     pendingIntent,
     statsQuery.data,
-    statsQuery.isLoading,
-    targetYearMonth,
+    statsQuery.isError,
+    baseStatsQuery.data,
+    baseStatsQuery.isError,
     transactionsListQuery.data,
     transactionsListQuery.isLoading,
-    recurringQuery.data,
+    transactionsListQuery.isError,
+    recurringQuery.isError,
   ]);
 
   const handleSubmit = (event: FormEvent) => {
@@ -109,39 +155,30 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
 
     const intent = parseIntent(text, categoriesQuery.data ?? [], currentYearMonth);
     const userMessage: ChatMessage = { id: crypto.randomUUID(), role: "user", lines: [text] };
+    const needs = needsOf(intent);
 
-    if (needsMonthlyStats(intent) && intent.yearMonth !== targetYearMonth) {
-      // 다른 달을 물어봤다 — 그 달을 다시 불러오는 동안 대기 메시지를 보여준다.
-      setTargetYearMonth(intent.yearMonth);
+    // 지금 들고 있는 조회로 답할 수 없으면 상태를 바꿔 다시 불러오고, 그동안 대기 메시지를 띄운다.
+    let mustWait = false;
+    if (needs.yearMonth && needs.yearMonth !== targetYearMonth) {
+      setTargetYearMonth(needs.yearMonth);
+      mustWait = true;
+    }
+    if (needs.baseYearMonth && needs.baseYearMonth !== baseYearMonth) {
+      setBaseYearMonth(needs.baseYearMonth);
+      mustWait = true;
+    }
+    if (needs.list && JSON.stringify(needs.list) !== JSON.stringify(listFilters)) {
+      setListFilters(needs.list);
+      mustWait = true;
+    }
+    setInput("");
+
+    if (mustWait) {
       setPendingIntent(intent);
       setMessages((prev) => [...prev, userMessage, CHECKING_MESSAGE]);
-      setInput("");
       return;
     }
-
-    if (needsTransactionsList(intent)) {
-      const requestedParams = toListParams(intent.filters);
-      if (JSON.stringify(requestedParams) !== JSON.stringify(listFilters)) {
-        // 다른 필터(기간·구분·카테고리·건수)를 물어봤다 — 그 조합을 다시 불러오는 동안 대기한다.
-        setListFilters(requestedParams);
-        setPendingIntent(intent);
-        setMessages((prev) => [...prev, userMessage, CHECKING_MESSAGE]);
-        setInput("");
-        return;
-      }
-    }
-
-    const data: ChatData = {
-      stats: statsQuery.data,
-      transactionsList: transactionsListQuery.data?.content,
-      recurring: recurringQuery.data,
-    };
-    setMessages((prev) => [
-      ...prev,
-      userMessage,
-      { id: crypto.randomUUID(), role: "bot", lines: buildAnswer(intent, data) },
-    ]);
-    setInput("");
+    setMessages((prev) => [...prev, userMessage, { id: crypto.randomUUID(), role: "bot", lines: answer(intent) }]);
   };
 
   return (
