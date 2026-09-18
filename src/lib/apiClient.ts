@@ -56,6 +56,13 @@ export function clearToken(): void {
   }
 }
 
+// 401을 만나면 토큰을 버리고 로그인으로 보낸다. request/download 두 경로가 같은 동작을 해야 하므로
+// 한 군데로 모은다 — 한쪽만 고치면 "만료된 토큰으로 화면이 잠깐 노출되는" 상태가 생긴다.
+function handleUnauthorized(): void {
+  clearToken();
+  if (typeof window !== "undefined") window.location.href = "/login";
+}
+
 type QueryParams = Record<string, string | number | boolean | undefined>;
 
 interface RequestOptions {
@@ -101,10 +108,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     // 이 코드를 만나면 무조건 로그아웃 처리한다. 로그인 폼 자체의 401(비밀번호 오류)은 이 클라이언트가
     // 아니라 로그인 화면이 직접 처리한다.
     if (body.error.code === "UNAUTHORIZED" && path !== "/auth/login") {
-      clearToken();
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
+      handleUnauthorized();
     }
     throw new ApiRequestError(body.error.code, body.error.message, response.status);
   }
@@ -127,10 +131,7 @@ async function download(path: string, params?: QueryParams): Promise<DownloadRes
   const response = await fetch(buildUrl(path, params), { headers });
 
   if (!response.ok) {
-    if (response.status === 401) {
-      clearToken();
-      if (typeof window !== "undefined") window.location.href = "/login";
-    }
+    if (response.status === 401) handleUnauthorized();
     throw new ApiRequestError("DOWNLOAD_FAILED", "파일을 내려받지 못했습니다.", response.status);
   }
 
