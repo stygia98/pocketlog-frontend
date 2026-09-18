@@ -82,7 +82,9 @@ function TransactionsPageContent() {
       <QuickAddBar categories={categories} />
 
       <div className="rounded-xl border border-border bg-card p-4">
-        <TransactionFilters categories={categories} />
+        {/* 필터 값이 바뀌면(검색 제출·필터 초기화·뒤로가기) 리마운트해 내부 draft 상태를
+            새 URL 값으로 다시 초기화한다 — 그 전까지는 draft가 그대로 유지돼 입력 중 검색이 안 된다. */}
+        <TransactionFilters key={JSON.stringify(filtersWithoutPage)} categories={categories} />
       </div>
 
       {totalElements === 0 ? (
