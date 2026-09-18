@@ -145,7 +145,10 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex h-[28rem] w-80 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl sm:w-96">
+    // resize: 브라우저 기본 리사이즈 핸들을 쓴다(우측 하단 모서리, 별도 라이브러리 없음). 이 패널은
+    // fixed right-4 bottom-20으로 우하단에 고정돼 있어, 핸들을 당기면 그 모서리를 축으로 왼쪽·위로
+    // 늘어난다 — 토글 버튼과 겹치지 않는 방향과 자연히 맞아떨어진다.
+    <div className="flex h-[28rem] w-80 min-h-80 max-h-[85vh] min-w-72 max-w-[90vw] resize flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl sm:w-96">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <p className="text-sm font-semibold">포켓로그 도우미</p>
         <button
