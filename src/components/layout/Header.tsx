@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileSpreadsheet, LayoutDashboard, LogOut, Receipt, Settings, Wallet } from "lucide-react";
+import { FileSpreadsheet, LayoutDashboard, LogOut, Receipt, Wallet } from "lucide-react";
 
 import { useAuth, useMeQuery } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+// 예산과 카테고리 설정을 한 페이지(/budgets)로 합쳐서 별도 "설정" 메뉴를 두지 않는다.
 const NAV_ITEMS = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
   { href: "/transactions", label: "내역", icon: Receipt },
-  { href: "/budgets", label: "예산", icon: Wallet },
-  { href: "/settings/categories", label: "설정", icon: Settings },
+  { href: "/budgets", label: "예산·설정", icon: Wallet },
   { href: "/data", label: "데이터", icon: FileSpreadsheet },
 ];
 

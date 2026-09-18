@@ -84,7 +84,7 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
     return (
       <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
         거래를 등록하려면 카테고리를 먼저 만들어 주세요.{" "}
-        <Link href="/settings/categories" className="text-primary underline-offset-4 hover:underline">
+        <Link href="/budgets" className="text-primary underline-offset-4 hover:underline">
           설정으로 이동
         </Link>
       </div>
