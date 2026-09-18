@@ -56,12 +56,18 @@ export function MonthHeatmap({ data, onSelectDate }: MonthHeatmapProps) {
             }}
           >
             <span className="text-[11px] font-semibold leading-none text-muted-foreground sm:text-lg">{getDate(parseISO(d.date))}</span>
-            <span className="truncate text-[9px] font-bold leading-tight sm:text-[15px]" style={{ color: "var(--income)" }}>
-              {formatCompactAmount(d.income)}
-            </span>
-            <span className="truncate text-[9px] font-bold leading-tight sm:text-[15px]" style={{ color: "var(--expense)" }}>
-              {formatCompactAmount(d.expense)}
-            </span>
+            {/* 수입·지출이 0원인 줄은 아예 렌더링하지 않는다 — 매일 "0원"이 두 줄씩 반복되면
+                실제 값이 있는 날이 눈에 띄지 않는다. 둘 다 0이면 날짜만 보인다. */}
+            {d.income > 0 && (
+              <span className="truncate text-[9px] font-bold leading-tight sm:text-[15px]" style={{ color: "var(--income)" }}>
+                {formatCompactAmount(d.income)}
+              </span>
+            )}
+            {d.expense > 0 && (
+              <span className="truncate text-[9px] font-bold leading-tight sm:text-[15px]" style={{ color: "var(--expense)" }}>
+                {formatCompactAmount(d.expense)}
+              </span>
+            )}
           </button>
         );
       })}
