@@ -61,7 +61,7 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
     if (!file) return;
 
     try {
-      const result = await receiptParseMutation.mutateAsync(file);
+      const result = await receiptParseMutation.mutateAsync({ file, categories });
       if (!result.amount && !result.categoryId && !result.merchant && !result.txnDate) {
         toast.error("영수증을 읽지 못했어요. 직접 입력해 주세요.");
         return;
