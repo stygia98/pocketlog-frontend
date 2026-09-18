@@ -106,19 +106,18 @@ export function QuickAddBar({ categories }: QuickAddBarProps) {
       {/*
         순수 OCR(Tesseract.js)은 배경이 섞이거나 기울어진 사진에서 정확도가 크게 떨어진다
         (레이아웃 분석이 배경 질감을 글자로 오인함). 알고리즘으로 보정하는 대신, 애초에 잘
-        찍도록 안내하는 쪽이 훨씬 저렴하고 효과적이다 — 버튼 위치(데스크톱 상단 / 모바일
-        하단)와 무관하게 항상 보이도록 여기 한 줄로 둔다.
+        찍도록 안내하는 쪽이 훨씬 저렴하고 효과적이다. 데스크톱에서는 버튼과 한 줄로 묶고,
+        모바일에서는 버튼이 폼 하단(extraActions)에 따로 있어 문구만 단독으로 보인다.
       */}
-      <p className="mb-2 text-xs text-muted-foreground">
-        촬영 팁: 배경 없이 영수증만 반듯하게 채워서 찍으면 더 잘 인식돼요.
-      </p>
-
-      {/* 데스크톱: 카드 상단 우측. 모바일에서는 등록 버튼 옆(TransactionForm의 extraActions)에 둔다. */}
-      <div className="mb-3 hidden justify-end sm:flex">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-xs text-muted-foreground">
+          촬영 팁: 배경 없이 영수증만 반듯하게 채워서 찍으면 더 잘 인식돼요.
+        </p>
         <Button
           type="button"
           variant="outline"
           size="sm"
+          className="hidden shrink-0 sm:inline-flex"
           disabled={receiptParseMutation.isPending}
           onClick={() => receiptInputRef.current?.click()}
         >
