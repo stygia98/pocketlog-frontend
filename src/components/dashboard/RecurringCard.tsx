@@ -40,15 +40,23 @@ export function RecurringCard({ asOf }: RecurringCardProps) {
         <>
           <ul className="mt-2 flex flex-col gap-2">
             {items.map((item) => (
-              <li
-                key={`${item.merchant}-${item.categoryId}`}
-                className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm"
-              >
-                <span className="font-medium">{item.merchant}</span>
-                <span className="text-muted-foreground">
-                  {item.monthsSeen}개월 연속 · {formatDate(item.lastDate)}
-                </span>
-                <span className="tabular-nums">{formatAmount(item.medianAmount)}</span>
+              <li key={`${item.merchant}-${item.categoryId}`} className="text-sm">
+                {/*
+                  상호명 칸을 고정폭(sm 이상)으로 둬야 옆 칸("N개월 연속 · 날짜")의 시작 위치가
+                  상호명 글자 수와 무관하게 줄마다 가지런히 맞는다. 다만 이 카드는 폭이 좁아
+                  (대시보드 2열 그리드) sm 미만에서 셋을 한 줄에 다 넣으면 날짜가 잘린다
+                  ("3개월 연속 · 202...") — sm 미만에서는 상호명을 한 줄, 날짜·금액을 그 아래
+                  한 줄로 나눈다.
+                */}
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+                  <span className="truncate font-medium sm:w-28 sm:shrink-0">{item.merchant}</span>
+                  <span className="flex items-center justify-between gap-3 sm:contents">
+                    <span className="text-muted-foreground sm:flex-1 sm:truncate">
+                      {item.monthsSeen}개월 연속 · {formatDate(item.lastDate)}
+                    </span>
+                    <span className="shrink-0 tabular-nums">{formatAmount(item.medianAmount)}</span>
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
