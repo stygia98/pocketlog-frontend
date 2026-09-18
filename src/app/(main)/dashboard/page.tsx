@@ -65,11 +65,11 @@ function DashboardPageContent() {
       <NoSpendStreakCard daily={stats.daily} asOf={asOf} isPastMonth={isPastMonth} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <ForecastCard forecast={stats.forecast} isPastMonth={isPastMonth} />
+        <AnomalyCard anomalies={stats.anomalies} />
         <RecurringCard asOf={asOf} />
       </div>
 
-      <AnomalyCard anomalies={stats.anomalies} />
+      <ForecastCard forecast={stats.forecast} isPastMonth={isPastMonth} />
 
       {hasNoActivity && (
         <p className="text-center text-sm text-muted-foreground">이 달에는 기록이 없어요</p>
