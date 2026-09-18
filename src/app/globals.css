@@ -7,7 +7,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: ui-monospace, monospace;
-  --font-heading: var(--font-sans);
+  --font-heading: Georgia, "Times New Roman", Times, serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -59,43 +59,44 @@
   --color-category-9: #737373;
 }
 
-/* CLAUDE.md 8장 팔레트. shadcn이 만든 토큰 이름(--primary 등)은 컴포넌트가 그대로 참조하므로 유지하고
-   값만 이 프로젝트 팔레트로 재매핑한다. */
+/* Anthropic 브랜드 팔레트(Ivory/Slate/Clay)로 재매핑. shadcn이 만든 토큰 이름(--primary 등)은
+   컴포넌트가 그대로 참조하므로 유지하고 값만 바꾼다. --sidebar-*는 이 프로젝트가 사이드바 셸을
+   쓰지 않아(상단 헤더) 실제로 참조되지 않는 예비 토큰이라 메인 팔레트를 그대로 미러링한다. */
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
+  --background: #faf9f5;
+  --foreground: #141413;
   --card: #ffffff;
-  --card-foreground: #171717;
+  --card-foreground: #141413;
   --popover: #ffffff;
-  --popover-foreground: #171717;
-  --primary: #4f46e5;
+  --popover-foreground: #141413;
+  --primary: #d97757;
   --primary-foreground: #ffffff;
-  --secondary: #f5f5f5;
-  --secondary-foreground: #171717;
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
-  --accent: #f5f5f5;
-  --accent-foreground: #171717;
-  --destructive: #ef4444;
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #4f46e5;
-  --chart-1: #ef4444;
-  --chart-2: #f59e0b;
-  --chart-3: #10b981;
-  --chart-4: #4f46e5;
-  --chart-5: #ec4899;
+  --secondary: #f0eee6;
+  --secondary-foreground: #141413;
+  --muted: #f0eee6;
+  --muted-foreground: #73726c;
+  --accent: #f0eee6;
+  --accent-foreground: #141413;
+  --destructive: #b3452f;
+  --border: #dedcd1;
+  --input: #dedcd1;
+  --ring: #d97757;
+  --chart-1: #d97757;
+  --chart-2: #558a42;
+  --chart-3: #6a9bcc;
+  --chart-4: #6b4d9e;
+  --chart-5: #a64d87;
   --radius: 0.625rem;
-  --sidebar: #fafafa;
-  --sidebar-foreground: #171717;
-  --sidebar-primary: #4f46e5;
+  --sidebar: #faf9f5;
+  --sidebar-foreground: #141413;
+  --sidebar-primary: #d97757;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #171717;
-  --sidebar-border: #e5e5e5;
-  --sidebar-ring: #4f46e5;
-  --income: #10b981;
-  --expense: #ef4444;
+  --sidebar-accent: #f0eee6;
+  --sidebar-accent-foreground: #141413;
+  --sidebar-border: #dedcd1;
+  --sidebar-ring: #d97757;
+  --income: #558a42;
+  --expense: #b3452f;
 }
 
 /* ⚠️ class 전략(.dark)을 쓰지 않는다 — 토글 UI가 없는데 class 전략을 쓰면 서버 렌더는 라이트로
@@ -103,39 +104,39 @@
    전환하고, @theme은 위에서 이미 선언했으므로 여기서는 :root의 커스텀 프로퍼티 값만 덮어쓴다. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #fafafa;
-    --card: #171717;
-    --card-foreground: #fafafa;
-    --popover: #171717;
-    --popover-foreground: #fafafa;
-    --primary: #4f46e5;
+    --background: #1a1918;
+    --foreground: #faf9f5;
+    --card: #1f1e1d;
+    --card-foreground: #faf9f5;
+    --popover: #1f1e1d;
+    --popover-foreground: #faf9f5;
+    --primary: #d97757;
     --primary-foreground: #ffffff;
-    --secondary: #262626;
-    --secondary-foreground: #fafafa;
-    --muted: #262626;
-    --muted-foreground: #737373;
-    --accent: #262626;
-    --accent-foreground: #fafafa;
-    --destructive: #ef4444;
-    --border: #262626;
-    --input: #262626;
-    --ring: #4f46e5;
-    --chart-1: #ef4444;
-    --chart-2: #f59e0b;
-    --chart-3: #10b981;
-    --chart-4: #4f46e5;
-    --chart-5: #ec4899;
-    --sidebar: #0a0a0a;
-    --sidebar-foreground: #fafafa;
-    --sidebar-primary: #4f46e5;
+    --secondary: #262624;
+    --secondary-foreground: #faf9f5;
+    --muted: #262624;
+    --muted-foreground: #9c9a92;
+    --accent: #262624;
+    --accent-foreground: #faf9f5;
+    --destructive: #c2624a;
+    --border: #30302e;
+    --input: #30302e;
+    --ring: #d97757;
+    --chart-1: #d97757;
+    --chart-2: #558a42;
+    --chart-3: #6a9bcc;
+    --chart-4: #6b4d9e;
+    --chart-5: #a64d87;
+    --sidebar: #1a1918;
+    --sidebar-foreground: #faf9f5;
+    --sidebar-primary: #d97757;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #262626;
-    --sidebar-accent-foreground: #fafafa;
-    --sidebar-border: #262626;
-    --sidebar-ring: #4f46e5;
-    --income: #10b981;
-    --expense: #ef4444;
+    --sidebar-accent: #262624;
+    --sidebar-accent-foreground: #faf9f5;
+    --sidebar-border: #30302e;
+    --sidebar-ring: #d97757;
+    --income: #558a42;
+    --expense: #b3452f;
   }
 }
 

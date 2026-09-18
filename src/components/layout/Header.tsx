@@ -25,8 +25,8 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background">
-        <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/dashboard" className="text-base font-semibold">
+        <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+          <Link href="/dashboard" className="font-heading text-lg font-medium">
             포켓로그
           </Link>
 
@@ -36,8 +36,8 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                  pathname === item.href && "bg-muted text-foreground"
+                  "rounded-full px-3.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground",
+                  pathname === item.href && "bg-primary/14 font-medium text-foreground"
                 )}
               >
                 {item.label}
@@ -47,7 +47,7 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             {/* 이메일은 UserResponse에 있어도 여기서 참조하지 않는다 — DOM에 아예 존재하면 안 된다(AUTH-08). */}
-            {user && <span className="text-sm font-medium">{user.nickname}</span>}
+            {user && <span className="text-sm text-muted-foreground">{user.nickname}</span>}
             <Button variant="ghost" size="icon" onClick={logout} aria-label="로그아웃">
               <LogOut className="h-4 w-4" />
             </Button>

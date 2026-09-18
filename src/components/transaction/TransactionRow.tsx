@@ -60,7 +60,7 @@ export function TransactionRow({ transaction, categories, onDelete, isDeleting }
 
       <span
         className={cn(
-          "shrink-0 tabular-nums text-sm font-medium",
+          "shrink-0 text-sm font-semibold tabular-nums",
           transaction.type === "INCOME" ? "text-income" : "text-expense"
         )}
       >

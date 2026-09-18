@@ -36,7 +36,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <>
       <Header />
       {/* 모바일 하단 탭바(fixed)에 콘텐츠가 가리지 않도록 여백을 둔다 */}
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-20 pt-6 sm:px-6 sm:pb-6">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-20 pt-8 sm:px-6 sm:pb-8">{children}</main>
       <ChatWidget />
     </>
   );

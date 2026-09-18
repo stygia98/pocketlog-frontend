@@ -132,7 +132,7 @@ export default function TransactionDetailPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-xl font-semibold">거래 상세</h1>
+      <h1 className="font-heading text-xl font-medium">거래 상세</h1>
 
       <TransactionForm
         idPrefix="detail"
