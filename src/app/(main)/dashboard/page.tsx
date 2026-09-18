@@ -8,6 +8,7 @@ import { BudgetUsage } from "@/components/dashboard/BudgetUsage";
 import { CategoryBreakdown } from "@/components/dashboard/CategoryBreakdown";
 import { DailyHeatmap } from "@/components/dashboard/DailyHeatmap";
 import { ForecastCard } from "@/components/dashboard/ForecastCard";
+import { NoSpendStreakCard } from "@/components/dashboard/NoSpendStreakCard";
 import { RecurringCard } from "@/components/dashboard/RecurringCard";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { CardSkeleton } from "@/components/common/Skeleton";
@@ -60,6 +61,8 @@ function DashboardPageContent() {
         onSelectDate={(date) => router.push(`/transactions?from=${date}&to=${date}`)}
         asOf={asOf}
       />
+
+      <NoSpendStreakCard daily={stats.daily} asOf={asOf} isPastMonth={isPastMonth} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <ForecastCard forecast={stats.forecast} isPastMonth={isPastMonth} />
