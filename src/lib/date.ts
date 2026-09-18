@@ -24,11 +24,6 @@ export function toYearMonthString(date: Date): string {
   return format(date, YEAR_MONTH_FORMAT);
 }
 
-/** createdAt/updatedAt처럼 서버가 ISO-8601 UTC 문자열로 내려준 값을 화면 표시용으로 변환한다. */
-export function formatDateTime(isoUtc: string): string {
-  return format(parseISO(isoUtc), "yyyy-MM-dd HH:mm");
-}
-
 /** yyyy-MM-dd 문자열을 화면 표시용(예: 2026-09-14)으로 그대로 포맷한다. */
 export function formatDate(dateString: string): string {
   return format(parseISO(dateString), DATE_FORMAT);
