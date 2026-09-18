@@ -58,6 +58,7 @@ function DashboardPageContent() {
       <DailyHeatmap
         daily={stats.daily}
         onSelectDate={(date) => router.push(`/transactions?from=${date}&to=${date}`)}
+        asOf={asOf}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
