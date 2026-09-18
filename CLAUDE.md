@@ -48,6 +48,12 @@ src/
 
 `recharts` · `react-hook-form` · `zod` · `@hookform/resolvers` · `framer-motion`(→ `motion`으로 대체) · `opencsv`류. 이유는 부모 `CLAUDE.md` 3장 참조.
 
+## 영수증 OCR (`TXN-13`)
+
+`tesseract.js`는 이 원칙의 유일한 예외다 — OCR은 직접 구현할 수 있는 종류의 일이 아니다. 인식은 **전부 브라우저에서** 끝나고(`lib/receipts.ts`), 백엔드 엔드포인트도 외부 API 키도 쓰지 않는다. 최초 1회 언어 데이터(kor+eng)만 CDN에서 받아 IndexedDB에 캐시한다.
+
+> ⚠️ **순수 OCR이라 사진 품질에 정확도가 크게 좌우된다.** 배경이 섞이거나 기울어진 사진은 레이아웃 분석이 무너져 거의 못 읽는다. 알고리즘으로 보정하는 대신 퀵 입력 바의 촬영 안내 문구로 대응하기로 했다.
+
 ## 테스트
 
 이 프로젝트는 자동화된 E2E 테스트 도구(Playwright 등)를 쓰지 않는다. 화면 검증은 `ROADMAP.md` 각 Phase의 DoD 체크리스트를 수동으로 확인하는 방식이다.
