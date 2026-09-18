@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { LocationPickerDialog } from "@/components/transaction/LocationPickerDialog";
 import { formatAmount, parseAmount } from "@/lib/money";
+import { cn } from "@/lib/utils";
 import type { Category, TransactionType } from "@/types/transaction";
 
 // 퀵 입력 바(QuickAddBar)와 상세 화면(/transactions/[id])이 그대로 재사용하는 완전 controlled 폼.
@@ -45,6 +46,12 @@ interface TransactionFormProps {
   idPrefix?: string;
   /** 제출 버튼 옆에 추가로 둘 버튼(예: 퀵 입력 바의 영수증 첨부). 이 컴포넌트는 내용을 모른다. */
   extraActions?: React.ReactNode;
+  /**
+   * "inline"(기본): 퀵 입력 바·상세 페이지가 쓰는 한 줄 배치.
+   * "stacked": 팝업(TransactionEditDialog)이 쓰는 세로 배치 — 필드마다 한 줄씩 차지하고
+   * 지출/수입 버튼이 넓어지며 액션 버튼이 오른쪽으로 정렬된다.
+   */
+  layout?: "inline" | "stacked";
 }
 
 export function TransactionForm({
@@ -59,7 +66,9 @@ export function TransactionForm({
   onDelete,
   idPrefix = "transaction-form",
   extraActions,
+  layout = "inline",
 }: TransactionFormProps) {
+  const isStacked = layout === "stacked";
   const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
   const categoryOptions = categories.filter((c) => c.type === values.type && !c.deleted);
 
@@ -89,10 +98,11 @@ export function TransactionForm({
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3" noValidate>
-        <div className="flex gap-1">
+        <div className={cn("flex gap-1", isStacked && "gap-2")}>
           <Button
             type="button"
             variant={values.type === "EXPENSE" ? "default" : "outline"}
+            className={cn(isStacked && "flex-1")}
             onClick={() => handleTypeChange("EXPENSE")}
           >
             지출
@@ -100,27 +110,33 @@ export function TransactionForm({
           <Button
             type="button"
             variant={values.type === "INCOME" ? "default" : "outline"}
+            className={cn(isStacked && "flex-1")}
             onClick={() => handleTypeChange("INCOME")}
           >
             수입
           </Button>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <div
+          className={cn(
+            "flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end",
+            isStacked && "sm:flex-col sm:items-stretch"
+          )}
+        >
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-amount`} className="justify-center">금액</Label>
+            <Label htmlFor={`${idPrefix}-amount`} className={cn(!isStacked && "justify-center")}>금액</Label>
             <Input
               id={`${idPrefix}-amount`}
               type="text"
               inputMode="numeric"
-              className="sm:w-32"
+              className={cn("sm:w-32", isStacked && "sm:w-full")}
               value={values.amountRaw === "" ? "" : formatAmount(values.amountRaw)}
               onChange={(event) => onChange({ ...values, amountRaw: parseAmount(event.target.value) })}
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-category`} className="justify-center">카테고리</Label>
+            <Label htmlFor={`${idPrefix}-category`} className={cn(!isStacked && "justify-center")}>카테고리</Label>
             <Select
               // value에 undefined를 넘기면 Radix가 controlled에서 uncontrolled로 전환돼 마지막
               // 선택값을 그대로 남겨 버린다(리셋이 화면에 반영되지 않음) — 항상 문자열을 넘겨 controlled를 유지한다.
@@ -132,7 +148,14 @@ export function TransactionForm({
                 onChange({ ...values, categoryId: Number(value) });
               }}
             >
-              <SelectTrigger id={`${idPrefix}-category`} className="w-full sm:w-36">
+              <SelectTrigger
+                id={`${idPrefix}-category`}
+                className={cn(
+                  "w-full sm:w-36",
+                  isStacked &&
+                    "sm:w-full *:data-[slot=select-value]:flex-1 data-placeholder:*:data-[slot=select-value]:justify-center"
+                )}
+              >
                 <SelectValue placeholder="카테고리 선택" />
               </SelectTrigger>
               <SelectContent>
@@ -146,24 +169,24 @@ export function TransactionForm({
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-date`} className="justify-center">날짜</Label>
+            <Label htmlFor={`${idPrefix}-date`} className={cn(!isStacked && "justify-center")}>날짜</Label>
             <Input
               id={`${idPrefix}-date`}
               type="date"
-              className="sm:w-40"
+              className={cn("sm:w-40", isStacked && "sm:w-full")}
               value={values.txnDate}
               onChange={(event) => onChange({ ...values, txnDate: event.target.value })}
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-merchant`} className="justify-center">거래처</Label>
+            <Label htmlFor={`${idPrefix}-merchant`} className={cn(!isStacked && "justify-center")}>거래처</Label>
             <div className="flex items-center gap-1">
               <Input
                 id={`${idPrefix}-merchant`}
                 type="text"
                 maxLength={100}
-                className="sm:w-40"
+                className={cn("sm:w-40", isStacked && "sm:w-full")}
                 value={values.merchant}
                 onChange={(event) => onChange({ ...values, merchant: event.target.value })}
               />
@@ -190,8 +213,8 @@ export function TransactionForm({
             </div>
           </div>
 
-          <div className="flex flex-col gap-1 sm:min-w-40 sm:flex-1">
-            <Label htmlFor={`${idPrefix}-memo`} className="justify-center">메모</Label>
+          <div className={cn("flex flex-col gap-1 sm:min-w-40 sm:flex-1", isStacked && "sm:w-full")}>
+            <Label htmlFor={`${idPrefix}-memo`} className={cn(!isStacked && "justify-center")}>메모</Label>
             <Input
               id={`${idPrefix}-memo`}
               type="text"
@@ -201,7 +224,7 @@ export function TransactionForm({
             />
           </div>
 
-          <div className="flex gap-2">
+          <div className={cn("flex gap-2", isStacked && "sm:w-full sm:justify-end")}>
             <Button type="submit" disabled={isSubmitDisabled}>
               {isSubmitting ? "저장 중..." : submitLabel}
             </Button>

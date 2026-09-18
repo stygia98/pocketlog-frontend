@@ -104,6 +104,7 @@ function TransactionsPageContent() {
         <div className="rounded-xl border border-border bg-card p-4">
           <TransactionList
             transactions={transactions}
+            categories={categories}
             onDeletedLastItem={() => {
               if (!isMobile && filters.page > 0) setFilter({ page: filters.page - 1 });
             }}

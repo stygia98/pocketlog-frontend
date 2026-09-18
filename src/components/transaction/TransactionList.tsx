@@ -15,15 +15,16 @@ import {
 } from "@/components/ui/dialog";
 import { useDeleteTransactionMutation } from "@/hooks/useTransactions";
 import { formatAmount } from "@/lib/money";
-import type { Transaction } from "@/types/transaction";
+import type { Category, Transaction } from "@/types/transaction";
 
 interface TransactionListProps {
   transactions: Transaction[];
+  categories: Category[];
   /** 삭제 후 이 페이지가 비면(마지막 한 건이었으면) 호출된다. 실제 페이지 이동은 부모가 처리한다. */
   onDeletedLastItem: () => void;
 }
 
-export function TransactionList({ transactions, onDeletedLastItem }: TransactionListProps) {
+export function TransactionList({ transactions, categories, onDeletedLastItem }: TransactionListProps) {
   const deleteMutation = useDeleteTransactionMutation();
   const shouldReduceMotion = useReducedMotion();
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
@@ -56,6 +57,7 @@ export function TransactionList({ transactions, onDeletedLastItem }: Transaction
           >
             <TransactionRow
               transaction={transaction}
+              categories={categories}
               onDelete={() => setDeleteTarget(transaction)}
               isDeleting={deleteMutation.isPending && deleteMutation.variables === transaction.id}
             />
