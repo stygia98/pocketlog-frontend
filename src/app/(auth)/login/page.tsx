@@ -36,7 +36,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="reveal-stack mx-auto flex w-full max-w-sm flex-col justify-center gap-8 px-4 py-12">
+    <div className="reveal-stack mx-auto flex w-full max-w-sm flex-col justify-center gap-5 px-4 py-5 lg:gap-8 lg:py-12">
       <div className="space-y-1 text-center">
         <h1 className="font-heading text-2xl font-bold text-logo">포켓로그</h1>
         <p className="text-sm text-muted-foreground">로그인하고 이번 달 지출을 확인하세요.</p>

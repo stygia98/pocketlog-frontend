@@ -59,7 +59,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="reveal-stack mx-auto flex w-full max-w-sm flex-col justify-center gap-8 px-4 py-12">
+    <div className="reveal-stack mx-auto flex w-full max-w-sm flex-col justify-center gap-5 px-4 py-5 lg:gap-8 lg:py-12">
       <div className="space-y-1 text-center">
         <h1 className="font-heading text-2xl font-bold text-logo">회원가입</h1>
         <p className="text-sm text-muted-foreground">가입하면 기본 카테고리 9개가 자동으로 만들어져요.</p>

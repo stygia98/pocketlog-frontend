@@ -36,14 +36,14 @@ function Chip({
   const tr = (transition: Transition): Transition => (reduce ? { duration: 0, delay: 0 } : transition);
   return (
     <motion.div
-      className={`absolute ${className}`}
+      className={className}
       initial={{ opacity: 0, y: 10, scale: 0.94 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={tr({ duration: 0.4, delay, ease: EASE_OUT })}
     >
       {/* 등장이 끝난 뒤에만 아주 작게 떠다닌다. 사용자 동작과 무관한 움직임이라 진폭을 5px로 제한한다. */}
       <motion.div
-        className="flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium"
+        className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium lg:px-3.5 lg:py-2 lg:text-sm"
         animate={reduce ? undefined : { y: [0, -5, 0] }}
         transition={tr({ duration: 5.5, delay: delay + 0.6, repeat: Infinity, ease: "easeInOut" })}
       >
@@ -61,7 +61,7 @@ export function AuthShowcase() {
 
   return (
     <aside
-      className="relative isolate flex min-h-64 flex-col justify-between overflow-hidden p-6 lg:min-h-dvh lg:p-12"
+      className="relative isolate flex flex-col justify-between overflow-hidden px-6 pt-6 pb-6 lg:min-h-dvh lg:p-12"
       style={{ background: PAPER_BACKGROUND }}
     >
       <div aria-hidden className={GRAIN_CLASS} style={{ backgroundImage: GRAIN }} />
@@ -180,24 +180,35 @@ export function AuthShowcase() {
 
         {/* 제품의 핵심 가치를 보여주는 두 칩. 좁은 화면에서는 숨긴다 */}
         <div className="hidden lg:block">
-          <Chip className="-top-2 left-0" delay={1.3} reduce={reduce}>
+          <Chip className="absolute -top-2 left-0" delay={1.3} reduce={reduce}>
             <span className="h-2 w-2 rounded-full bg-income" />
             이번 달 이 속도면 2,610,000원
           </Chip>
-          <Chip className="-bottom-4 right-0" delay={1.5} reduce={reduce}>
+          <Chip className="absolute -bottom-4 right-0" delay={1.5} reduce={reduce}>
             <span className="h-2 w-2 rounded-full bg-primary" />
             넷플릭스 17,000원 · 3개월 연속
           </Chip>
         </div>
       </div>
 
-      <div className="hidden lg:block">
-        <p className="text-4xl leading-[1.15] font-extrabold tracking-tight text-foreground">
+      <div className="text-center lg:text-left">
+        <p className="text-2xl leading-[1.2] font-extrabold tracking-tight text-foreground lg:text-4xl lg:leading-[1.15]">
           3초 안에 기록하고,
           <br />
           이번 달을 미리 봐요.
         </p>
-        <p className="mt-4 max-w-sm text-base leading-relaxed text-muted-foreground">
+        {/* 모바일: 일러스트 위에 겹치던 두 칩을 문구 아래로 내려 나란히 쌓는다 */}
+        <div className="mt-4 flex flex-col items-center gap-2 lg:hidden">
+          <Chip className="relative" delay={1.3} reduce={reduce}>
+            <span className="h-2 w-2 rounded-full bg-income" />
+            이번 달 이 속도면 2,610,000원
+          </Chip>
+          <Chip className="relative" delay={1.5} reduce={reduce}>
+            <span className="h-2 w-2 rounded-full bg-primary" />
+            넷플릭스 17,000원 · 3개월 연속
+          </Chip>
+        </div>
+        <p className="mt-4 hidden max-w-sm text-base leading-relaxed text-muted-foreground lg:block">
           쌓인 기록으로 이번 달 지출을 예측하고, 매달 나가는 고정지출은 알아서 찾아드려요.
         </p>
       </div>
