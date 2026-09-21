@@ -100,7 +100,7 @@ export function ChatWidget() {
       <Button
         type="button"
         size="icon-lg"
-        className="cursor-grab touch-none rounded-full shadow-lg active:cursor-grabbing"
+        className="size-14 cursor-grab touch-none rounded-full shadow-lg active:cursor-grabbing pointer-coarse:size-14"
         aria-label={isOpen ? "챗봇 닫기" : "챗봇 열기"}
         title="끌어서 위치 이동"
         onPointerDown={handlePointerDown}
@@ -109,7 +109,7 @@ export function ChatWidget() {
         onPointerCancel={() => (dragRef.current = null)}
         onClick={handleClick}
       >
-        {isOpen ? <X className="size-5" /> : <MessageCircle className="size-5" />}
+        {isOpen ? <X className="size-7" /> : <MessageCircle className="size-7" />}
       </Button>
     </div>
   );
