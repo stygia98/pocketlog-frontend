@@ -7,7 +7,7 @@ import { formatAmount } from "@/lib/money";
 export type ChartDatum = { name: string; value: number; color?: string };
 
 // 색 미지정 시 배정하는 순서 (CLAUDE.md 8장 카테고리 팔레트, globals.css --color-category-* 와 동일).
-const PALETTE = [
+export const PALETTE = [
   "var(--color-category-1)",
   "var(--color-category-2)",
   "var(--color-category-3)",
