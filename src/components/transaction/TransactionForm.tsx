@@ -124,7 +124,7 @@ export function TransactionForm({
           )}
         >
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-amount`} className={cn(!isStacked && "justify-center")}>금액</Label>
+            <Label htmlFor={`${idPrefix}-amount`}>금액</Label>
             <Input
               id={`${idPrefix}-amount`}
               type="text"
@@ -136,7 +136,7 @@ export function TransactionForm({
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-category`} className={cn(!isStacked && "justify-center")}>카테고리</Label>
+            <Label htmlFor={`${idPrefix}-category`}>카테고리</Label>
             <Select
               // value에 undefined를 넘기면 Radix가 controlled에서 uncontrolled로 전환돼 마지막
               // 선택값을 그대로 남겨 버린다(리셋이 화면에 반영되지 않음) — 항상 문자열을 넘겨 controlled를 유지한다.
@@ -169,7 +169,7 @@ export function TransactionForm({
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-date`} className={cn(!isStacked && "justify-center")}>날짜</Label>
+            <Label htmlFor={`${idPrefix}-date`}>날짜</Label>
             <Input
               id={`${idPrefix}-date`}
               type="date"
@@ -180,7 +180,7 @@ export function TransactionForm({
           </div>
 
           <div className="flex flex-col gap-1">
-            <Label htmlFor={`${idPrefix}-merchant`} className={cn(!isStacked && "justify-center")}>거래처</Label>
+            <Label htmlFor={`${idPrefix}-merchant`}>거래처</Label>
             <div className="flex items-center gap-1">
               <Input
                 id={`${idPrefix}-merchant`}
@@ -214,7 +214,7 @@ export function TransactionForm({
           </div>
 
           <div className={cn("flex flex-col gap-1 sm:min-w-40 sm:flex-1", isStacked && "sm:w-full")}>
-            <Label htmlFor={`${idPrefix}-memo`} className={cn(!isStacked && "justify-center")}>메모</Label>
+            <Label htmlFor={`${idPrefix}-memo`}>메모</Label>
             <Input
               id={`${idPrefix}-memo`}
               type="text"
