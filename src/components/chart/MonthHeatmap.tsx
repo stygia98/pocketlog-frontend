@@ -1,7 +1,7 @@
 // CSS grid-cols-7 + 배경색 단계. Recharts에는 이런 차트가 없어 처음부터 직접 구현한다 (CLAUDE.md 3장).
 // 배경 농도는 지출액 기준 4단계(파스텔)로 나눈다 — PRD STAT-03 "지출액에 따라 배경 농도 4단계".
 
-import { getDate, getDay, parseISO } from "date-fns";
+import { getDate, getDay, parseISO, subDays } from "date-fns";
 import { motion } from "motion/react";
 
 import { formatCompactAmount } from "@/lib/money";
@@ -34,10 +34,23 @@ function intensityTier(expense: number, max: number): number {
   return 4;
 }
 
+// 이전·다음 달 날짜 칸. 데이터가 없는 자리를 채워 달력 모양을 맞추기만 하므로 옅게 보이고 누를 수 없다.
+function OutsideDay({ day }: { day: number }) {
+  return (
+    <div aria-hidden className="aspect-square rounded-sm border border-border bg-white p-1 opacity-40">
+      <span className="text-[13px] font-semibold leading-none sm:text-lg" style={{ color: INK.date }}>
+        {day}
+      </span>
+    </div>
+  );
+}
+
 export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
   const max = Math.max(1, ...data.map((d) => d.expense));
-  // 1일이 무슨 요일인지에 맞춰 앞쪽을 빈 칸으로 채워 실제 달력처럼 정렬한다.
+  // 1일이 무슨 요일인지에 맞춰 앞쪽을 이전 달 날짜로, 마지막 주의 남는 칸을 다음 달 날짜로 채워 실제 달력처럼 정렬한다.
   const leadingBlanks = data.length > 0 ? getDay(parseISO(data[0].date)) : 0;
+  const prevMonthLastDay = data.length > 0 ? getDate(subDays(parseISO(data[0].date), 1)) : 0;
+  const trailingBlanks = (7 - ((leadingBlanks + data.length) % 7)) % 7;
 
   return (
     <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
@@ -47,7 +60,7 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
         </div>
       ))}
       {Array.from({ length: leadingBlanks }).map((_, index) => (
-        <div key={`blank-${index}`} aria-hidden />
+        <OutsideDay key={`prev-${index}`} day={prevMonthLastDay - leadingBlanks + 1 + index} />
       ))}
       {data.map((d) => {
         const tier = intensityTier(d.expense, max);
@@ -95,6 +108,9 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
           </button>
         );
       })}
+      {Array.from({ length: trailingBlanks }).map((_, index) => (
+        <OutsideDay key={`next-${index}`} day={index + 1} />
+      ))}
     </div>
   );
 }
