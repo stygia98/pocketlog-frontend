@@ -13,15 +13,15 @@ export default function BudgetsPage() {
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-4">
+        <p className="text-sm text-muted-foreground">카테고리 관리</p>
+        <CategorySection />
+      </section>
+
+      <section className="flex flex-col gap-4 border-t border-border pt-8">
         <p className="text-sm text-muted-foreground">예산</p>
         <Suspense fallback={<ListSkeleton count={5} />}>
           <BudgetSection />
         </Suspense>
-      </section>
-
-      <section className="flex flex-col gap-4 border-t border-border pt-8">
-        <p className="text-sm text-muted-foreground">카테고리 관리</p>
-        <CategorySection />
       </section>
     </div>
   );

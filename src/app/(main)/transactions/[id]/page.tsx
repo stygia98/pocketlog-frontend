@@ -178,11 +178,11 @@ export default function TransactionDetailPage() {
           <DialogHeader>
             <DialogTitle>삭제하시겠습니까?</DialogTitle>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
+          <DialogFooter className="py-2">
+            <Button variant="outline" size="sm" onClick={() => setIsDeleteConfirmOpen(false)}>
               취소
             </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
+            <Button variant="destructive" size="sm" onClick={handleConfirmDelete}>
               확인
             </Button>
           </DialogFooter>

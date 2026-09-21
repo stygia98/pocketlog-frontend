@@ -76,11 +76,11 @@ export function TransactionList({ transactions, categories, onDeletedLastItem }:
               </DialogDescription>
             )}
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+          <DialogFooter className="py-2">
+            <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>
               취소
             </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
+            <Button variant="destructive" size="sm" onClick={handleConfirmDelete}>
               확인
             </Button>
           </DialogFooter>

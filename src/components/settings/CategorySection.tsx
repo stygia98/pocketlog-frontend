@@ -122,14 +122,17 @@ export function CategorySection() {
                 <div
                   className={`flex items-center justify-between gap-4 p-4 ${index > 0 ? "border-t border-border" : ""}`}
                 >
-                  <span className="flex items-center gap-2 text-sm font-medium">
+                  {/* 순서를 앞에 고정 너비로 두어 카테고리 이름의 시작 위치가 모든 행에서 세로로 맞는다. */}
+                  <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
+                    <span className="w-14 shrink-0 text-xs font-normal tabular-nums text-muted-foreground">
+                      순서 {index}
+                    </span>
                     <span
                       className="inline-block h-2 w-2 shrink-0 rounded-full"
                       style={{ backgroundColor: category.color }}
                       aria-hidden
                     />
-                    {category.name}
-                    <span className="text-xs text-muted-foreground">순서 {index}</span>
+                    <span className="truncate">{category.name}</span>
                   </span>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => openEditDialog(category, index)}>
@@ -176,11 +179,11 @@ export function CategorySection() {
               &ldquo;{deleteTarget?.name}&rdquo; 카테고리를 삭제합니다. 과거 내역은 그대로 남습니다.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+          <DialogFooter className="py-2">
+            <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>
               취소
             </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
+            <Button variant="destructive" size="sm" onClick={handleConfirmDelete}>
               삭제
             </Button>
           </DialogFooter>
