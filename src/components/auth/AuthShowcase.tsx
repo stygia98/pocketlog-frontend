@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion, type Transition } from "motion/react";
 
 import { GRAIN, GRAIN_CLASS, PAPER_BACKGROUND } from "@/components/illustration/paper";
 
@@ -25,26 +25,27 @@ const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 function Chip({
   className,
   delay,
-  float,
+  reduce,
   children,
 }: {
   className: string;
   delay: number;
-  float: boolean;
+  reduce: boolean;
   children: React.ReactNode;
 }) {
+  const tr = (transition: Transition): Transition => (reduce ? { duration: 0, delay: 0 } : transition);
   return (
     <motion.div
       className={`absolute ${className}`}
-      initial={float ? { opacity: 0, y: 10, scale: 0.94 } : false}
+      initial={{ opacity: 0, y: 10, scale: 0.94 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, delay, ease: EASE_OUT }}
+      transition={tr({ duration: 0.4, delay, ease: EASE_OUT })}
     >
       {/* 등장이 끝난 뒤에만 아주 작게 떠다닌다. 사용자 동작과 무관한 움직임이라 진폭을 5px로 제한한다. */}
       <motion.div
         className="flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium"
-        animate={float ? { y: [0, -5, 0] } : undefined}
-        transition={{ duration: 5.5, delay: delay + 0.6, repeat: Infinity, ease: "easeInOut" }}
+        animate={reduce ? undefined : { y: [0, -5, 0] }}
+        transition={tr({ duration: 5.5, delay: delay + 0.6, repeat: Infinity, ease: "easeInOut" })}
       >
         {children}
       </motion.div>
@@ -53,9 +54,10 @@ function Chip({
 }
 
 export function AuthShowcase() {
-  // reduce가 true면 모든 initial을 끄고(false) 최종 상태로 바로 그린다.
+  // 서버 렌더와 첫 클라이언트 렌더의 initial을 같게 두려고(하이드레이션 불일치 방지) initial은 항상 숨김 상태로 두고,
+  // prefers-reduced-motion이면 전환 시간만 0으로 만들어 최종 상태로 바로 보이게 한다.
   const reduce = useReducedMotion() ?? false;
-  const motionOn = !reduce;
+  const tr = (transition: Transition): Transition => (reduce ? { duration: 0, delay: 0 } : transition);
 
   return (
     <aside
@@ -88,18 +90,18 @@ export function AuthShowcase() {
               height="196"
               rx="24"
               fill="var(--net)"
-              initial={motionOn ? { opacity: 0, y: 28 } : false}
+              initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1, ease: EASE_OUT }}
+              transition={tr({ duration: 0.5, delay: 0.1, ease: EASE_OUT })}
             />
           </g>
 
           {/* 앞 카드(장부) */}
           <g transform="rotate(-4 195 160)">
             <motion.g
-              initial={motionOn ? { opacity: 0, y: 32 } : false}
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.22, ease: EASE_OUT }}
+              transition={tr({ duration: 0.55, delay: 0.22, ease: EASE_OUT })}
             >
               <rect x="60" y="60" width="270" height="200" rx="24" fill="var(--card)" stroke="var(--border)" />
               {/* 라벨 줄과 큰 금액 줄: 실제 글자 대신 막대로 그려 언어·수치와 무관한 장식으로 둔다 */}
@@ -114,9 +116,9 @@ export function AuthShowcase() {
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                initial={motionOn ? { pathLength: 0 } : false}
+                initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ duration: 1.1, delay: 0.6, ease: "easeInOut" }}
+                transition={tr({ duration: 1.1, delay: 0.6, ease: "easeInOut" })}
               />
               <motion.circle
                 cx="306"
@@ -125,9 +127,9 @@ export function AuthShowcase() {
                 fill="var(--income)"
                 stroke="var(--card)"
                 strokeWidth="3"
-                initial={motionOn ? { scale: 0 } : false}
+                initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ duration: 0.3, delay: 1.65, ease: EASE_OUT }}
+                transition={tr({ duration: 0.3, delay: 1.65, ease: EASE_OUT })}
                 style={{ transformOrigin: "306px 150px" }}
               />
 
@@ -145,9 +147,9 @@ export function AuthShowcase() {
           {COINS.map((coin) => (
             <motion.g
               key={`${coin.cx}-${coin.cy}`}
-              initial={motionOn ? { y: -90, opacity: 0 } : false}
+              initial={{ y: -90, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 15, delay: coin.delay }}
+              transition={tr({ type: "spring", stiffness: 260, damping: 15, delay: coin.delay })}
             >
               <circle cx={coin.cx} cy={coin.cy} r="24" fill="var(--primary)" />
               <circle cx={coin.cx} cy={coin.cy} r="17" stroke="var(--primary-foreground)" strokeOpacity="0.55" strokeWidth="2" />
@@ -171,18 +173,18 @@ export function AuthShowcase() {
           src="/assets/no-spend-stamp.png"
           alt=""
           className="pointer-events-none absolute -bottom-5 -left-2 w-[26%] max-w-28"
-          initial={motionOn ? { opacity: 0, scale: 1.6, rotate: -22 } : false}
+          initial={{ opacity: 0, scale: 1.6, rotate: -22 }}
           animate={{ opacity: 1, scale: 1, rotate: -10 }}
-          transition={{ type: "spring", stiffness: 420, damping: 20, delay: 1.75 }}
+          transition={tr({ type: "spring", stiffness: 420, damping: 20, delay: 1.75 })}
         />
 
         {/* 제품의 핵심 가치를 보여주는 두 칩. 좁은 화면에서는 숨긴다 */}
         <div className="hidden lg:block">
-          <Chip className="-top-2 left-0" delay={1.3} float={motionOn}>
+          <Chip className="-top-2 left-0" delay={1.3} reduce={reduce}>
             <span className="h-2 w-2 rounded-full bg-income" />
             이번 달 이 속도면 2,610,000원
           </Chip>
-          <Chip className="-bottom-4 right-0" delay={1.5} float={motionOn}>
+          <Chip className="-bottom-4 right-0" delay={1.5} reduce={reduce}>
             <span className="h-2 w-2 rounded-full bg-primary" />
             넷플릭스 17,000원 · 3개월 연속
           </Chip>
