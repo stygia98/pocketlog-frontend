@@ -15,7 +15,7 @@ export function ChatWidget() {
 
   return (
     // 모바일 하단 탭 바(Header.tsx의 fixed bottom-0 nav)에 가리지 않도록 bottom을 그 높이만큼 띄운다.
-    <div className="fixed right-4 bottom-20 z-50 flex flex-col items-end gap-3 sm:right-6 sm:bottom-6">
+    <div className="fixed right-4 bottom-20 z-50 flex flex-col items-end gap-3 sm:right-6 md:bottom-6">
       <AnimatePresence>
         {isOpen && (
           <motion.div

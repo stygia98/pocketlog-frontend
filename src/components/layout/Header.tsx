@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
   { href: "/transactions", label: "내역", icon: Receipt },
   { href: "/budgets", label: "예산·설정", icon: Wallet },
-  { href: "/data", label: "데이터", icon: FileSpreadsheet },
+  { href: "/data", label: "내역관리", icon: FileSpreadsheet },
 ];
 
 export function Header() {
@@ -28,11 +28,11 @@ export function Header() {
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/dashboard" className="font-heading text-lg font-medium">
+          <Link href="/dashboard" className="font-heading text-lg font-bold">
             포켓로그
           </Link>
 
-          <nav className="hidden items-center gap-1 sm:flex">
+          <nav className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -49,7 +49,7 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             {/* 이메일은 UserResponse에 있어도 여기서 참조하지 않는다 — DOM에 아예 존재하면 안 된다(AUTH-08). */}
-            {user && <span className="text-sm text-muted-foreground">{user.nickname}</span>}
+            {user && <span className="text-sm text-muted-foreground">{user.nickname}님</span>}
             <Button
               variant="ghost"
               size="icon"
@@ -65,7 +65,7 @@ export function Header() {
         </div>
       </header>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background sm:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background md:hidden">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
