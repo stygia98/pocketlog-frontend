@@ -36,7 +36,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-16">
+    <div className="reveal-stack mx-auto flex w-full max-w-sm flex-col justify-center gap-8 px-4 py-12">
       <div className="space-y-1 text-center">
         <h1 className="font-heading text-2xl font-bold text-logo">포켓로그</h1>
         <p className="text-sm text-muted-foreground">로그인하고 이번 달 지출을 확인하세요.</p>
@@ -52,6 +52,7 @@ export default function LoginPage() {
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="email">이메일</Label>
           <Input
+            className="h-11"
             id="email"
             type="email"
             autoComplete="email"
@@ -64,6 +65,7 @@ export default function LoginPage() {
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="password">비밀번호</Label>
           <Input
+            className="h-11"
             id="password"
             type="password"
             autoComplete="current-password"
@@ -73,7 +75,7 @@ export default function LoginPage() {
           />
         </div>
 
-        <Button type="submit" disabled={loginMutation.isPending}>
+        <Button type="submit" className="h-11 text-base" disabled={loginMutation.isPending}>
           {loginMutation.isPending ? "로그인 중..." : "로그인"}
         </Button>
       </form>

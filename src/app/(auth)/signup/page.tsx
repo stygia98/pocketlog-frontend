@@ -59,9 +59,9 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-16">
+    <div className="reveal-stack mx-auto flex w-full max-w-sm flex-col justify-center gap-8 px-4 py-12">
       <div className="space-y-1 text-center">
-        <h1 className="font-heading text-2xl font-medium">회원가입</h1>
+        <h1 className="font-heading text-2xl font-bold text-logo">회원가입</h1>
         <p className="text-sm text-muted-foreground">가입하면 기본 카테고리 9개가 자동으로 만들어져요.</p>
       </div>
 
@@ -75,6 +75,7 @@ export default function SignupPage() {
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="email">이메일</Label>
           <Input
+            className="h-11"
             id="email"
             type="email"
             autoComplete="email"
@@ -89,6 +90,7 @@ export default function SignupPage() {
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="nickname">닉네임</Label>
           <Input
+            className="h-11"
             id="nickname"
             type="text"
             autoComplete="nickname"
@@ -101,6 +103,7 @@ export default function SignupPage() {
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="password">비밀번호</Label>
           <Input
+            className="h-11"
             id="password"
             type="password"
             autoComplete="new-password"
@@ -112,7 +115,7 @@ export default function SignupPage() {
           {isPasswordInvalid && <p className="text-sm text-destructive">{PASSWORD_HELP_TEXT}</p>}
         </div>
 
-        <Button type="submit" disabled={isSubmitDisabled}>
+        <Button type="submit" className="h-11 text-base" disabled={isSubmitDisabled}>
           {isPending ? "가입 중..." : "회원가입"}
         </Button>
       </form>
