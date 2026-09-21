@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type PointerEvent } from "react";
 import { Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -181,11 +181,54 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
     setMessages((prev) => [...prev, userMessage, { id: crypto.randomUUID(), role: "bot", lines: answer(intent) }]);
   };
 
+  // 좌상단 핸들 드래그로 크기를 바꾼다. 브라우저 기본 `resize`는 우하단 핸들만 지원해 직접 구현한다.
+  // 패널이 우하단에 고정돼 있어 왼쪽·위로 당기면 커지고, 최소·최대는 CSS(min/max-*)가 잡아준다.
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+
+  const startResize = (event: PointerEvent<HTMLDivElement>) => {
+    const panel = panelRef.current;
+    if (!panel) return;
+    event.preventDefault();
+    const { offsetWidth: startW, offsetHeight: startH } = panel;
+    const { left, top } = panel.getBoundingClientRect();
+    const { clientX: startX, clientY: startY } = event;
+    const handle = event.currentTarget;
+    handle.setPointerCapture(event.pointerId);
+
+    // 위젯을 옮길 수 있으므로, 커지다가 화면 왼쪽·위로 넘치지 않게 여백 8px까지만 허용한다.
+    const onMove = (e: globalThis.PointerEvent) =>
+      setSize({
+        width: Math.min(startW + (startX - e.clientX), startW + left - 8),
+        height: Math.min(startH + (startY - e.clientY), startH + top - 8),
+      });
+    const onEnd = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onEnd);
+      handle.removeEventListener("pointercancel", onEnd);
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onEnd);
+    handle.addEventListener("pointercancel", onEnd);
+  };
+
   return (
-    // resize: 브라우저 기본 리사이즈 핸들을 쓴다(우측 하단 모서리, 별도 라이브러리 없음). 이 패널은
-    // fixed right-4 bottom-20으로 우하단에 고정돼 있어, 핸들을 당기면 그 모서리를 축으로 왼쪽·위로
-    // 늘어난다 — 토글 버튼과 겹치지 않는 방향과 자연히 맞아떨어진다.
-    <div className="flex h-[28rem] w-80 min-h-80 max-h-[85vh] min-w-72 max-w-[90vw] resize flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl sm:w-96">
+    <div
+      ref={panelRef}
+      style={size ?? undefined}
+      className="relative flex h-[28rem] w-80 min-h-80 max-h-[85vh] min-w-72 max-w-[90vw] flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xl sm:w-96"
+    >
+      <div
+        onPointerDown={startResize}
+        aria-hidden
+        title="끌어서 크기 조절"
+        className="absolute top-0 left-0 z-10 flex size-6 cursor-nwse-resize touch-none items-start justify-start p-1 text-muted-foreground/60 hover:text-foreground pointer-coarse:size-9"
+      >
+        {/* 좌상단 모서리를 가리키는 두 줄 그립 */}
+        <svg viewBox="0 0 10 10" className="size-3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <path d="M1 9 9 1M1 5 5 1" />
+        </svg>
+      </div>
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <p className="text-sm font-semibold">포켓로그 도우미</p>
         <button
