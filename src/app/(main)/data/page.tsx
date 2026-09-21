@@ -37,14 +37,14 @@ export default function DataPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+      <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold">내보내기</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="export-from">시작일</Label>
             <Input id="export-from" type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             <Label htmlFor="export-to">종료일</Label>
             <Input id="export-to" type="date" value={to} onChange={(event) => setTo(event.target.value)} />
           </div>
@@ -57,43 +57,34 @@ export default function DataPage() {
         )}
       </section>
 
-      <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+      <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold">가져오기</h2>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="text-muted-foreground">
-              <tr>
-                <th className="pr-4 pb-1 font-medium">날짜</th>
-                <th className="pr-4 pb-1 font-medium">구분</th>
-                <th className="pr-4 pb-1 font-medium">카테고리</th>
-                <th className="pr-4 pb-1 font-medium">금액</th>
-                <th className="pr-4 pb-1 font-medium">거래처</th>
-                <th className="pb-1 font-medium">메모</th>
+              <tr className="border-b border-border">
+                <th className="py-2 pr-4 font-medium">날짜</th>
+                <th className="py-2 pr-4 font-medium">구분</th>
+                <th className="py-2 pr-4 font-medium">카테고리</th>
+                <th className="py-2 pr-4 font-medium">금액</th>
+                <th className="py-2 pr-4 font-medium">거래처</th>
+                <th className="py-2 font-medium">메모</th>
               </tr>
             </thead>
             <tbody className="tabular-nums">
               <tr>
-                <td className="pr-4">2026-09-14</td>
-                <td className="pr-4">지출</td>
-                <td className="pr-4">식비</td>
-                <td className="pr-4">12500</td>
-                <td className="pr-4">스타벅스 강남점</td>
-                <td>팀 미팅</td>
+                <td className="py-2 pr-4">2026-09-14</td>
+                <td className="py-2 pr-4">지출</td>
+                <td className="py-2 pr-4">식비</td>
+                <td className="py-2 pr-4">12500</td>
+                <td className="py-2 pr-4">스타벅스 강남점</td>
+                <td className="py-2">팀 미팅</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p className="text-sm text-muted-foreground">
-          구분은 &ldquo;수입&rdquo;/&ldquo;지출&rdquo;로 씁니다. 카테고리는 이름으로 매칭되며, 없는 이름은 자동으로
-          만들어지지 않고 그 행만 실패 처리됩니다. 업로드 상한은 1MB · 5,000행입니다.
-        </p>
-        <p className="text-sm text-muted-foreground">
-          이미 가져온 파일을 다시 올리면 중복 등록됩니다. 중복 여부를 확인하지 않으니 같은 파일을 두 번 올리지
-          않도록 주의해 주세요.
-        </p>
-
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-4">
           <Input
             type="file"
             accept=".csv"
@@ -107,6 +98,11 @@ export default function DataPage() {
             양식 다운로드
           </Button>
         </div>
+
+        {/* 중복 등록 안내는 CLAUDE.md가 화면에 두라고 정한 문구라 한 문장에 함께 담는다. */}
+        <p className="text-xs text-muted-foreground">
+          구분은 수입/지출로 쓰고, 없는 카테고리는 실패하며, 상한은 1MB·5,000행, 다시 올리면 중복 등록됩니다.
+        </p>
 
         {importMutation.isError && <p className="text-sm text-destructive">가져오지 못했어요. 다시 시도해 주세요.</p>}
 
