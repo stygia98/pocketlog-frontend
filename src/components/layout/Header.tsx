@@ -33,34 +33,37 @@ export function Header() {
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/dashboard" className="font-heading text-lg font-bold text-logo">
-            포켓로그
-          </Link>
+          {/* 로고와 메뉴를 한 묶음으로 왼쪽에 붙인다. 오른쪽은 닉네임·테마·로그아웃 묶음이 차지한다. */}
+          <div className="flex items-center gap-6">
+            <Link href="/dashboard" className="font-heading text-lg font-bold text-logo">
+              포켓로그
+            </Link>
 
-          <nav aria-label="주 메뉴" className="hidden items-center gap-1 md:flex">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={pathname === item.href ? "page" : undefined}
-                className={cn(
-                  "relative rounded-full px-3.5 py-1.5 pointer-coarse:py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground",
-                  pathname === item.href && "font-medium text-foreground"
-                )}
-              >
-                {pathname === item.href && (
-                  // layoutId가 같아 라우트가 바뀌면 이 알약이 이전 메뉴에서 새 메뉴로 미끄러져 이동한다.
-                  <motion.span
-                    layoutId="nav-pill"
-                    aria-hidden
-                    className="absolute inset-0 rounded-full bg-primary/14"
-                    transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }}
-                  />
-                )}
-                <span className="relative">{item.label}</span>
-              </Link>
-            ))}
-          </nav>
+            <nav aria-label="주 메뉴" className="hidden items-center gap-1 md:flex">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                  className={cn(
+                    "relative rounded-full px-3.5 py-1.5 pointer-coarse:py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground",
+                    pathname === item.href && "font-medium text-foreground",
+                  )}
+                >
+                  {pathname === item.href && (
+                    // layoutId가 같아 라우트가 바뀌면 이 알약이 이전 메뉴에서 새 메뉴로 미끄러져 이동한다.
+                    <motion.span
+                      layoutId="nav-pill"
+                      aria-hidden
+                      className="absolute inset-0 rounded-full bg-primary/14"
+                      transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }}
+                    />
+                  )}
+                  <span className="relative">{item.label}</span>
+                </Link>
+              ))}
+            </nav>
+          </div>
 
           <div className="flex items-center gap-3">
             {/* 이메일은 UserResponse에 있어도 여기서 참조하지 않는다 — DOM에 아예 존재하면 안 된다(AUTH-08). */}
@@ -71,7 +74,7 @@ export function Header() {
                 onClick={() => setIsNicknameOpen(true)}
                 aria-label={`닉네임 변경 (현재 ${user.nickname})`}
                 title="닉네임 변경"
-                className="rounded-md px-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:min-h-11"
+                className="max-w-40 truncate rounded-md px-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:min-h-11"
               >
                 {user.nickname}님
               </button>
@@ -91,7 +94,10 @@ export function Header() {
         </div>
       </header>
 
-      <nav aria-label="하단 메뉴" className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background md:hidden">
+      <nav
+        aria-label="하단 메뉴"
+        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background md:hidden"
+      >
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -102,7 +108,7 @@ export function Header() {
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex flex-1 flex-col items-center gap-0.5 py-2 text-xs text-muted-foreground",
-                isActive && "text-primary"
+                isActive && "text-primary",
               )}
             >
               <Icon className="h-5 w-5" />

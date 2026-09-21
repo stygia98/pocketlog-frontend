@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import { PocketArt } from "@/components/illustration/Art";
-import { GRAIN, GRAIN_CLASS, PAPER_BACKGROUND } from "@/components/illustration/paper";
 import { Button } from "@/components/ui/button";
 import { useMeQuery } from "@/hooks/useAuth";
 
@@ -15,31 +13,20 @@ function greetingFor(hour: number): string {
   return "하루 장부를 마감할 시간이에요";
 }
 
-// 대시보드 맨 위. 매일 여는 화면의 첫인상이자, 이 화면에서 강조하는 유일한 행동(거래 기록하기)이다.
+// 대시보드 맨 위 한 줄. 화면의 h1(인사말)과 이 화면에서 강조하는 유일한 행동(거래 기록하기)만 둔다.
+// 큰 영역은 그 아래 광고 배너(AdBannerCarousel)가 차지한다.
 export function DashboardHero() {
   const { data: user } = useMeQuery(true);
   const greeting = greetingFor(new Date().getHours());
 
   return (
-    <section
-      className="relative isolate overflow-hidden rounded-2xl border border-border px-6 py-6 sm:px-8 sm:py-4"
-      style={{ background: PAPER_BACKGROUND }}
-    >
-      <div aria-hidden className={GRAIN_CLASS} style={{ backgroundImage: GRAIN }} />
-      <div className="flex items-center justify-between gap-6">
-        <div className="min-w-0">
-          <h1 className="text-2xl leading-tight font-extrabold tracking-tight sm:text-3xl">
-            {user ? `${user.nickname}님 ${greeting}` : greeting}
-          </h1>
-          <p className="mt-2 max-w-sm text-muted-foreground">오늘 쓴 돈은 3초면 기록할 수 있어요.</p>
-          <Button asChild className="mt-5">
-            <Link href="/transactions">거래 기록하기</Link>
-          </Button>
-        </div>
-        <div aria-hidden className="hidden w-48 shrink-0 sm:block lg:w-64">
-          <PocketArt />
-        </div>
-      </div>
+    <section className="flex items-center justify-between gap-4">
+      <h1 className="min-w-0 text-xl leading-tight font-extrabold tracking-tight sm:text-2xl">
+        {user ? `${user.nickname}님 ${greeting}` : greeting}
+      </h1>
+      <Button asChild className="shrink-0">
+        <Link href="/transactions">거래 기록하기</Link>
+      </Button>
     </section>
   );
 }

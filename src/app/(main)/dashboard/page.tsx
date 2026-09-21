@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { AnomalyCard } from "@/components/dashboard/AnomalyCard";
 import { BudgetUsage } from "@/components/dashboard/BudgetUsage";
+import { AdBannerCarousel } from "@/components/dashboard/AdBanner";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { CategoryBreakdown } from "@/components/dashboard/CategoryBreakdown";
 import { DailyHeatmap } from "@/components/dashboard/DailyHeatmap";
@@ -54,6 +55,7 @@ function DashboardPageContent() {
   return (
     <div className="reveal-stack flex flex-col gap-6">
       <DashboardHero />
+      <AdBannerCarousel />
 
       <MonthNavigator yearMonth={yearMonth} onPrev={goPrev} onNext={goNext} canGoNext={canGoNext} />
 

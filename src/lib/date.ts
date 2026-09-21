@@ -5,6 +5,7 @@
 // 기준으로 문자열을 만든다.
 
 import { endOfWeek, format, parseISO, startOfWeek, subDays } from "date-fns";
+import { ko } from "date-fns/locale";
 
 const DATE_FORMAT = "yyyy-MM-dd";
 const YEAR_MONTH_FORMAT = "yyyy-MM";
@@ -27,6 +28,11 @@ export function toYearMonthString(date: Date): string {
 /** yyyy-MM-dd 문자열을 화면 표시용(예: 2026-09-14)으로 그대로 포맷한다. */
 export function formatDate(dateString: string): string {
   return format(parseISO(dateString), DATE_FORMAT);
+}
+
+/** yyyy-MM-dd 문자열을 목록 표시용(예: 9월 15일 (화))으로 변환한다. 거래 목록 행에 쓴다. */
+export function formatMonthDayWeekday(dateString: string): string {
+  return format(parseISO(dateString), "M월 d일 (E)", { locale: ko });
 }
 
 /** yyyy-MM 문자열을 화면 표시용(예: 2026년 9월)으로 변환한다. 대시보드 월 선택 헤더에 쓴다. */
