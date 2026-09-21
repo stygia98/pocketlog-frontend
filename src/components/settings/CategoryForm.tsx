@@ -87,9 +87,10 @@ export function CategoryForm({
             <button
               key={color}
               type="button"
-              aria-label={color}
+              aria-label={`색상 ${color}`}
+              aria-pressed={values.color.toUpperCase() === color}
               onClick={() => onChange({ ...values, color })}
-              className={`h-7 w-7 rounded-full ${
+              className={`h-7 w-7 rounded-full pointer-coarse:h-11 pointer-coarse:w-11 ${
                 values.color.toUpperCase() === color ? "ring-2 ring-foreground ring-offset-2 ring-offset-popover" : ""
               }`}
               style={{ backgroundColor: color }}

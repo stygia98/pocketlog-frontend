@@ -65,7 +65,10 @@ export function useCreateTransactionMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: TransactionCreateRequest) => createTransaction(body),
-    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
+    onSuccess: () => {
+      invalidateTransactionRelatedQueries(queryClient);
+      toast.success("거래를 기록했어요");
+    },
   });
 }
 
@@ -73,7 +76,10 @@ export function useUpdateTransactionMutation(id: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: TransactionUpdateRequest) => updateTransaction(id, body),
-    onSuccess: () => invalidateTransactionRelatedQueries(queryClient),
+    onSuccess: () => {
+      invalidateTransactionRelatedQueries(queryClient);
+      toast.success("거래를 수정했어요");
+    },
   });
 }
 
@@ -114,7 +120,7 @@ export function useDeleteTransactionMutation() {
     // 성공했을 때만 무효화해 서버 확정 데이터로 갱신한다.
     onSuccess: () => {
       invalidateTransactionRelatedQueries(queryClient);
-      toast.success("삭제되었습니다");
+      toast.success("거래를 삭제했어요");
     },
   });
 }

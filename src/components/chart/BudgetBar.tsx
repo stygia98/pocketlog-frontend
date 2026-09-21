@@ -23,7 +23,7 @@ export function BudgetBar({ data }: BudgetBarProps) {
           <div key={d.name} className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-sm">
               {/* 이름 옆 점은 도넛 범례와 같은 모양이다. 막대는 예산 이내면 카테고리 색, 초과하면 빨강이다. */}
-              <span className="flex min-w-0 items-center gap-1.5">
+              <span className="flex min-w-0 items-center gap-2">
                 <span
                   className="inline-block h-2 w-2 shrink-0 rounded-full"
                   style={{ backgroundColor: d.color ?? "var(--muted-foreground)" }}
@@ -35,7 +35,18 @@ export function BudgetBar({ data }: BudgetBarProps) {
                 {d.budget > 0 ? `${Math.round(ratio * 100)}%` : "예산 미설정"}
               </span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-2 w-full overflow-hidden rounded-full bg-muted"
+              {...(d.budget > 0
+                ? {
+                    role: "progressbar",
+                    "aria-label": `${d.name} 예산 소진율`,
+                    "aria-valuemin": 0,
+                    "aria-valuemax": 100,
+                    "aria-valuenow": Math.round(ratio * 100),
+                  }
+                : {})}
+            >
               {/* 차트 막대는 200ms 상한의 예외로 300ms를 쓴다(CLAUDE.md 8장). */}
               <motion.div
                 className="h-full rounded-full"

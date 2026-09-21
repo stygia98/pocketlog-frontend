@@ -22,7 +22,10 @@ export function useCreateCategoryMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: CategoryCreateRequest) => createCategory(body),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() });
+      toast.success("카테고리를 추가했어요");
+    },
   });
 }
 
@@ -32,7 +35,10 @@ export function useUpdateCategoryMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, body }: { id: number; body: CategoryUpdateRequest }) => updateCategory(id, body),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all() });
+      toast.success("카테고리를 수정했어요");
+    },
   });
 }
 

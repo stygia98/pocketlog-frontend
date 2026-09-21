@@ -136,6 +136,7 @@ export function LocationPickerDialog({ open, onOpenChange, onSelect }: LocationP
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
             placeholder="상호명으로 검색 (예: 이마트)"
+            aria-label="상호명 검색"
           />
           <Button type="submit" disabled={isSearching}>
             {isSearching ? "검색 중..." : "검색"}

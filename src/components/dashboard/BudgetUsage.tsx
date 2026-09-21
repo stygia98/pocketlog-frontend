@@ -1,6 +1,9 @@
 "use client";
 
+import Link from "next/link";
+
 import { BudgetBar } from "@/components/chart/BudgetBar";
+import { Button } from "@/components/ui/button";
 import { useCategoriesQuery } from "@/hooks/useCategories";
 import type { BudgetStat } from "@/types/stats";
 
@@ -23,6 +26,9 @@ export function BudgetUsage({ budgets }: BudgetUsageProps) {
       <div className="rounded-xl border border-border bg-card p-4">
         <p className="text-sm text-muted-foreground">예산 소진율</p>
         <p className="mt-2 text-sm">설정된 예산이 없어요</p>
+        <Button asChild variant="outline" size="sm" className="mt-3">
+          <Link href="/budgets">예산 설정하기</Link>
+        </Button>
       </div>
     );
   }

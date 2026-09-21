@@ -31,11 +31,11 @@ export function CategoryBreakdown({ byCategory }: CategoryBreakdownProps) {
       {/* 도넛을 가운데(190px)에 두고, 목록은 그 아래 전체 폭으로 둔다. */}
       <div className="mt-3 flex flex-col items-center gap-5">
         <CategoryDonut data={donutData} size={190} strokeWidth={28} />
-        <ul className="flex w-full min-w-0 flex-col gap-2.5">
+        <ul className="flex w-full min-w-0 flex-col gap-3">
           {byCategory.map((category) => (
             <li key={category.categoryId} className="flex items-center justify-between gap-2 text-sm">
               {/* 이름 텍스트는 색 위가 아니라 점 옆에 둔다 — 사용자 지정 색이라 대비를 계산할 수 없다(PRD.md 5.1). */}
-              <span className="flex min-w-0 items-center gap-1.5">
+              <span className="flex min-w-0 items-center gap-2">
                 <span
                   className="inline-block h-2 w-2 shrink-0 rounded-full"
                   style={{

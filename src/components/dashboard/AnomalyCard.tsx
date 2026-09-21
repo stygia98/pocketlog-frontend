@@ -26,9 +26,9 @@ export function AnomalyCard({ anomalies }: AnomalyCardProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-4 tracking-wider">
       <p className="text-sm text-muted-foreground">이상치 안내</p>
-      <ul className="mt-2 flex flex-col gap-1">
+      <ul className="mt-3 flex flex-col gap-3">
         {anomalies.slice(0, 3).map((anomaly) => (
-          <li key={anomaly.categoryId} className="flex items-center gap-1.5 text-sm">
+          <li key={anomaly.categoryId} className="flex items-center gap-2 text-sm">
             <span
               className="inline-block h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: colorByCategoryId.get(anomaly.categoryId) ?? "var(--muted-foreground)" }}

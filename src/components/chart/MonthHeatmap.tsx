@@ -19,7 +19,11 @@ interface MonthHeatmapProps {
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 // 파스텔 4단계(연두~초록). 활동이 없는 날(0원/0원)은 이 배열이 아니라 흰색으로 따로 처리한다.
-const INTENSITY_COLORS = ["#F3F9EE", "#E0F0D6", "#CBE6BA", "#B2D99B"] as const;
+const INTENSITY_COLORS = ["#F3F9EE", "#E6F3DD", "#D6ECC8", "#C8E4B4"] as const;
+
+// 셀 배경은 다크 모드에서도 밝은 색이라 글자색은 테마 토큰(--income 등)이 아니라 고정 진한 색을 쓴다.
+// 가장 진한 4단계 배경 위에서도 WCAG AA(4.5:1)를 넘는 값이다.
+const INK = { date: "#3F3E3A", income: "#166C40", expense: "#4B4A45" } as const;
 
 function intensityTier(expense: number, max: number): number {
   if (expense <= 0) return 0;
@@ -36,7 +40,7 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
   const leadingBlanks = data.length > 0 ? getDay(parseISO(data[0].date)) : 0;
 
   return (
-    <div className="grid grid-cols-7 gap-1">
+    <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
       {WEEKDAY_LABELS.map((label) => (
         <div key={label} className="pb-1 text-center text-xs text-muted-foreground">
           {label}
@@ -73,18 +77,18 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
                 className="pointer-events-none absolute inset-0.5 size-[calc(100%-0.25rem)] object-contain"
               />
             )}
-            <span className="relative z-10 text-[13px] font-semibold leading-none text-muted-foreground sm:text-lg">
+            <span className="relative z-10 text-[13px] font-semibold leading-none sm:text-lg" style={{ color: INK.date }}>
               {getDate(parseISO(d.date))}
             </span>
             {/* 수입·지출이 0원인 줄은 아예 렌더링하지 않는다 — 매일 "0원"이 두 줄씩 반복되면
                 실제 값이 있는 날이 눈에 띄지 않는다. 둘 다 0이면 날짜만 보인다. */}
             {d.income > 0 && (
-              <span className="relative z-10 truncate text-[10px] font-medium leading-tight sm:text-[15px]" style={{ color: "var(--income)" }}>
+              <span className="relative z-10 truncate text-[10px] font-medium leading-tight sm:text-[15px]" style={{ color: INK.income }}>
                 {formatCompactAmount(d.income)}
               </span>
             )}
             {d.expense > 0 && (
-              <span className="relative z-10 truncate text-[10px] font-medium leading-tight sm:text-[15px]" style={{ color: "var(--expense)" }}>
+              <span className="relative z-10 truncate text-[10px] font-medium leading-tight sm:text-[15px]" style={{ color: INK.expense }}>
                 {formatCompactAmount(d.expense)}
               </span>
             )}

@@ -19,7 +19,7 @@ export function MonthNavigator({ yearMonth, onPrev, onNext, canGoNext = true }: 
       <Button variant="outline" size="icon" onClick={onPrev} aria-label="이전 달">
         <ChevronLeft className="h-4 w-4" />
       </Button>
-      <p className="min-w-28 text-center text-lg font-semibold">{formatYearMonth(yearMonth)}</p>
+      <p aria-live="polite" className="min-w-28 text-center text-lg font-semibold">{formatYearMonth(yearMonth)}</p>
       <Button variant="outline" size="icon" onClick={onNext} disabled={!canGoNext} aria-label="다음 달">
         <ChevronRight className="h-4 w-4" />
       </Button>

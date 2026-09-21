@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { listBudgets, upsertBudgets, type BudgetUpsertItem } from "@/lib/budgets";
 import { queryKeys } from "@/lib/queryKeys";
@@ -21,6 +22,7 @@ export function useUpsertBudgetsMutation(yearMonth: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all({ yearMonth }) });
       queryClient.invalidateQueries({ queryKey: queryKeys.stats.all() });
+      toast.success("예산을 저장했어요");
     },
   });
 }
