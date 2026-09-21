@@ -30,7 +30,7 @@ export function CategoryBreakdown({ byCategory }: CategoryBreakdownProps) {
     );
   }
 
-  const donutData = byCategory.map((category) => ({
+  const chartData = byCategory.map((category) => ({
     name: category.deleted ? `${category.name} (삭제됨)` : category.name,
     value: category.amount,
     color: HEX_COLOR_PATTERN.test(category.color) ? category.color : undefined,
@@ -43,7 +43,7 @@ export function CategoryBreakdown({ byCategory }: CategoryBreakdownProps) {
         <Tabs value={kind} onValueChange={(value) => setKind(value as ChartKind)}>
           <TabsList aria-label="차트 종류">
             <TabsTrigger value="donut" className="px-3">
-              도넛
+              원형
             </TabsTrigger>
             <TabsTrigger value="bar" className="px-3">
               막대
@@ -56,9 +56,9 @@ export function CategoryBreakdown({ byCategory }: CategoryBreakdownProps) {
       </div>
       {/* 도넛·트리맵은 그 아래 전체 폭 목록에서 정확한 금액을 보여준다. 막대는 이름·금액·비율을 이미 담고 있어 목록이 없다. */}
       <div className="mt-3 flex flex-col items-center gap-5">
-        {kind === "donut" && <CategoryDonut data={donutData} size={190} strokeWidth={28} />}
-        {kind === "treemap" && <CategoryTreemap data={donutData} />}
-        {kind === "bar" && <CategoryBar data={donutData} />}
+        {kind === "donut" && <CategoryDonut data={chartData} size={190} strokeWidth={28} />}
+        {kind === "treemap" && <CategoryTreemap data={chartData} />}
+        {kind === "bar" && <CategoryBar data={chartData} />}
         {kind !== "bar" && (
           <ul className="flex w-full min-w-0 flex-col gap-3">
             {byCategory.map((category) => (
