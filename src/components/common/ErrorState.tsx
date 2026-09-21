@@ -1,7 +1,6 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
-
+import { ErrorArt } from "@/components/illustration/Art";
 import { Button } from "@/components/ui/button";
 
 interface ErrorStateProps {
@@ -16,7 +15,9 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-      <AlertCircle className="h-10 w-10 text-destructive" aria-hidden />
+      <div aria-hidden className="reveal-once w-44">
+        <ErrorArt />
+      </div>
       <p className="text-sm text-muted-foreground">{message}</p>
       <Button variant="outline" onClick={onRetry}>
         다시 시도

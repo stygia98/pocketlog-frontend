@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { AnomalyCard } from "@/components/dashboard/AnomalyCard";
 import { BudgetUsage } from "@/components/dashboard/BudgetUsage";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { CategoryBreakdown } from "@/components/dashboard/CategoryBreakdown";
 import { DailyHeatmap } from "@/components/dashboard/DailyHeatmap";
 import { ForecastCard } from "@/components/dashboard/ForecastCard";
@@ -51,7 +52,9 @@ function DashboardPageContent() {
   const hasNoActivity = stats.summary.income === 0 && stats.summary.expense === 0;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="reveal-stack flex flex-col gap-6">
+      <DashboardHero />
+
       <MonthNavigator yearMonth={yearMonth} onPrev={goPrev} onNext={goNext} canGoNext={canGoNext} />
 
       <SummaryCards summary={stats.summary} />

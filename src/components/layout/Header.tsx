@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import { FileSpreadsheet, LayoutDashboard, LogOut, Moon, Receipt, Sun, Wallet } from "lucide-react";
 
 import { useAuth, useMeQuery } from "@/hooks/useAuth";
@@ -21,28 +22,39 @@ export function Header() {
   const pathname = usePathname();
   const { logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const reduceMotion = useReducedMotion();
   // Header는 (main) 레이아웃이 authenticated로 판정한 뒤에만 렌더되므로 항상 활성화한다.
   const { data: user } = useMeQuery(true);
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-background">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/dashboard" className="font-heading text-lg font-bold text-logo">
             포켓로그
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav aria-label="주 메뉴" className="hidden items-center gap-1 md:flex">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={pathname === item.href ? "page" : undefined}
                 className={cn(
-                  "rounded-full px-3.5 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground",
-                  pathname === item.href && "bg-primary/14 font-medium text-foreground"
+                  "relative rounded-full px-3.5 py-1.5 pointer-coarse:py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground",
+                  pathname === item.href && "font-medium text-foreground"
                 )}
               >
-                {item.label}
+                {pathname === item.href && (
+                  // layoutId가 같아 라우트가 바뀌면 이 알약이 이전 메뉴에서 새 메뉴로 미끄러져 이동한다.
+                  <motion.span
+                    layoutId="nav-pill"
+                    aria-hidden
+                    className="absolute inset-0 rounded-full bg-primary/14"
+                    transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 500, damping: 40 }}
+                  />
+                )}
+                <span className="relative">{item.label}</span>
               </Link>
             ))}
           </nav>
@@ -65,7 +77,7 @@ export function Header() {
         </div>
       </header>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background md:hidden">
+      <nav aria-label="하단 메뉴" className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-background md:hidden">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
@@ -73,6 +85,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex flex-1 flex-col items-center gap-0.5 py-2 text-xs text-muted-foreground",
                 isActive && "text-primary"

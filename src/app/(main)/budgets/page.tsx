@@ -3,7 +3,9 @@
 import { Suspense } from "react";
 
 import { BudgetSection } from "@/components/budget/BudgetSection";
+import { PageHeader } from "@/components/common/PageHeader";
 import { ListSkeleton } from "@/components/common/Skeleton";
+import { PiggyArt } from "@/components/illustration/Art";
 import { CategorySection } from "@/components/settings/CategorySection";
 
 // 예산과 카테고리 관리는 둘 다 "지출 카테고리를 어떻게 쓸지" 설정하는 화면이라 한 페이지로 합쳤다.
@@ -11,7 +13,9 @@ import { CategorySection } from "@/components/settings/CategorySection";
 export default function BudgetsPage() {
   // BudgetSection이 쓰는 useBudgetMonth 안에 useSearchParams가 있어 Suspense가 필요하다(Next15).
   return (
-    <div className="flex flex-col gap-8">
+    <div className="reveal-stack flex flex-col gap-8">
+      <PageHeader title="예산·설정" description="카테고리를 정리하고, 달마다 쓸 금액을 정해요." art={<PiggyArt />} />
+
       <section className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">카테고리 관리</p>
         <CategorySection />

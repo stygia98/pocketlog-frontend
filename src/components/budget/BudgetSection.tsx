@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { EmptyState } from "@/components/common/EmptyState";
+import { PiggyArt } from "@/components/illustration/Art";
 import { ErrorState } from "@/components/common/ErrorState";
 import { ListSkeleton } from "@/components/common/Skeleton";
 import { MonthNavigator } from "@/components/common/MonthNavigator";
@@ -77,6 +78,7 @@ export function BudgetSection() {
 
       {items.length === 0 ? (
         <EmptyState
+          art={<PiggyArt />}
           title="지출 카테고리가 없어요"
           description="예산을 설정하려면 지출 카테고리를 먼저 만들어 주세요."
         />
@@ -101,6 +103,7 @@ export function BudgetSection() {
                 type="text"
                 inputMode="numeric"
                 placeholder="미설정"
+                aria-label={`${item.name} 예산 금액`}
                 className="w-32 text-right tabular-nums"
                 value={draft[item.categoryId] ? formatAmount(draft[item.categoryId]) : ""}
                 onChange={(event) =>

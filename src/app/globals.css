@@ -84,7 +84,7 @@
   --card-foreground: #141413;
   --popover: #ffffff;
   --popover-foreground: #141413;
-  --primary: #d97757;
+  --primary: #b8542f;
   --primary-foreground: #ffffff;
   --secondary: #f0eee6;
   --secondary-foreground: #141413;
@@ -95,7 +95,7 @@
   --destructive: #b3452f;
   --border: #dedcd1;
   --input: #dedcd1;
-  --ring: #d97757;
+  --ring: #b8542f;
   --chart-1: #d97757;
   --chart-2: #558a42;
   --chart-3: #6a9bcc;
@@ -110,7 +110,7 @@
   --sidebar-accent-foreground: #141413;
   --sidebar-border: #dedcd1;
   --sidebar-ring: #d97757;
-  --income: #1b7a4b;
+  --income: #166c40;
   --expense: #4b4a45;
   --net: #b8542f;
   --logo: #5c3d2e;
@@ -128,14 +128,14 @@
   --popover: #1f1e1d;
   --popover-foreground: #faf9f5;
   --primary: #d97757;
-  --primary-foreground: #ffffff;
+  --primary-foreground: #141413;
   --secondary: #262624;
   --secondary-foreground: #faf9f5;
   --muted: #262624;
   --muted-foreground: #9c9a92;
   --accent: #262624;
   --accent-foreground: #faf9f5;
-  --destructive: #c2624a;
+  --destructive: #d4735c;
   --border: #30302e;
   --input: #30302e;
   --ring: #d97757;
@@ -164,8 +164,68 @@
   }
   body {
     @apply bg-background text-base text-foreground;
+    /* 화면 위쪽 모서리에만 은은하게 번지는 웜 톤 빛(Clay·수입 그린). 스크롤하면 사라지는 분위기용 배경이다. */
+    background-image:
+      radial-gradient(60rem 26rem at 100% -6%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%),
+      radial-gradient(44rem 22rem at -8% 0%, color-mix(in oklab, var(--income) 7%, transparent), transparent 70%);
+    background-repeat: no-repeat;
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* 페이지 진입 시 한 번 도는 순차 등장(.reveal-stack의 직계 자식). 스크롤·호버마다 흩어지는 효과 대신
+   "한 번 잘 짠 등장"에 모은다. 렌더되지 않는 자식(return null)은 DOM에 없으므로 순번 계산에 끼지 않는다. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal-stack > * {
+  animation: reveal-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.reveal-stack > :nth-child(2) { animation-delay: 60ms; }
+.reveal-stack > :nth-child(3) { animation-delay: 120ms; }
+.reveal-stack > :nth-child(4) { animation-delay: 180ms; }
+.reveal-stack > :nth-child(5) { animation-delay: 240ms; }
+.reveal-stack > :nth-child(6) { animation-delay: 300ms; }
+.reveal-stack > :nth-child(n + 7) { animation-delay: 360ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-stack > * {
+    animation: none;
+  }
+}
+
+/* 일러스트 등장 한 번(빈 상태·에러 상태). reveal-stack과 같은 키프레임을 쓴다. */
+.reveal-once {
+  animation: reveal-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* 일러스트 안 동전 하나만 천천히 떠오른다. 사용자 동작과 무관한 움직임이라 진폭을 4px로 제한한다. */
+@keyframes art-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.art-bob {
+  animation: art-bob 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-once,
+  .art-bob {
+    animation: none;
   }
 }

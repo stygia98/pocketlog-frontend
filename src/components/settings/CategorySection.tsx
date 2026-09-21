@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { EmptyState } from "@/components/common/EmptyState";
+import { TagsArt } from "@/components/illustration/Art";
 import { ErrorState } from "@/components/common/ErrorState";
 import { ListSkeleton } from "@/components/common/Skeleton";
 import { CATEGORY_PALETTE, CategoryForm, type CategoryFormValues } from "@/components/settings/CategoryForm";
@@ -105,7 +106,7 @@ export function CategorySection() {
       </Tabs>
 
       {categoriesForType.length === 0 ? (
-        <EmptyState title="카테고리가 없어요" description="새 카테고리를 추가해 보세요." />
+        <EmptyState art={<TagsArt />} title="카테고리가 없어요" description="새 카테고리를 추가해 보세요." />
       ) : (
         <div className="rounded-xl border border-border bg-card">
           <AnimatePresence initial={false}>

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { endOfMonth, startOfMonth } from "date-fns";
 
+import { PageHeader } from "@/components/common/PageHeader";
+import { CsvArt } from "@/components/illustration/Art";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +38,9 @@ export default function DataPage() {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="reveal-stack flex flex-col gap-8">
+      <PageHeader title="내역관리" description="엑셀 파일로 내보내거나, 기존 가계부를 가져와요." art={<CsvArt />} />
+
       <section className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
         <h2 className="text-sm font-semibold">내보내기</h2>
         <div className="flex flex-wrap items-end gap-4">
@@ -88,6 +92,7 @@ export default function DataPage() {
           <Input
             type="file"
             accept=".csv"
+            aria-label="가져올 CSV 파일"
             className="w-auto"
             onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           />

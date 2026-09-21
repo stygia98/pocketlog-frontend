@@ -3,6 +3,8 @@
 import { Suspense, useEffect } from "react";
 
 import { EmptyState } from "@/components/common/EmptyState";
+import { PageHeader } from "@/components/common/PageHeader";
+import { LedgerArt, SearchArt } from "@/components/illustration/Art";
 import { ErrorState } from "@/components/common/ErrorState";
 import { InfiniteScrollSentinel } from "@/components/common/InfiniteScrollSentinel";
 import { ListSkeleton } from "@/components/common/Skeleton";
@@ -78,7 +80,9 @@ function TransactionsPageContent() {
   const categories = categoriesQuery.data ?? [];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="reveal-stack flex flex-col gap-6">
+      <PageHeader title="내역" description="쓴 돈과 번 돈을 3초 안에 남기고, 지난 기록을 찾아봐요." art={<LedgerArt />} />
+
       <QuickAddBar categories={categories} />
 
       <div className="rounded-xl border border-border bg-card p-4">
@@ -90,6 +94,7 @@ function TransactionsPageContent() {
       {totalElements === 0 ? (
         hasActiveFilters ? (
           <EmptyState
+            art={<SearchArt />}
             title="조건에 맞는 내역이 없어요"
             action={
               <Button variant="outline" onClick={resetFilters}>
@@ -98,7 +103,7 @@ function TransactionsPageContent() {
             }
           />
         ) : (
-          <EmptyState title="아직 기록이 없어요" description="퀵 입력 바에서 첫 거래를 남겨보세요." />
+          <EmptyState art={<LedgerArt />} title="아직 기록이 없어요" description="퀵 입력 바에서 첫 거래를 남겨보세요." />
         )
       ) : (
         <div className="rounded-xl border border-border bg-card p-4">
