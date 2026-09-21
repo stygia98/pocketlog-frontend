@@ -1,15 +1,30 @@
 "use client"
 
+import { useSyncExternalStore } from "react"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
-// 이 프로젝트는 다크모드 토글 UI가 없다(prefers-color-scheme 자동 전환만 지원, CLAUDE.md 8장).
-// next-themes 같은 토글 라이브러리 없이도 Sonner는 theme="system"이면 자체적으로
-// prefers-color-scheme 미디어 쿼리를 구독해 라이트/다크를 자동 전환한다.
+// 앱은 헤더의 토글로 <html>에 .dark를 붙여 테마를 정한다(useTheme, CLAUDE.md 8장). Sonner의 theme="system"은
+// OS 설정만 따라 이 토글을 무시하므로(OS는 라이트인데 앱만 다크면 토스트가 흰색으로 뜬다), 같은 클래스를 구독해 맞춘다.
+function subscribeToThemeClass(onChange: () => void) {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+  return () => observer.disconnect()
+}
+
+function useIsDark() {
+  return useSyncExternalStore(
+    subscribeToThemeClass,
+    () => document.documentElement.classList.contains("dark"),
+    () => false,
+  )
+}
+
 const Toaster = ({ ...props }: ToasterProps) => {
+  const isDark = useIsDark()
   return (
     <Sonner
-      theme="system"
+      theme={isDark ? "dark" : "light"}
       className="toaster group"
       icons={{
         success: (
