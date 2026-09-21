@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { MapPin, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -16,12 +16,19 @@ const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
 interface TransactionRowProps {
   transaction: Transaction;
   categories: Category[];
-  onDelete: (id: number) => void;
+  // 행마다 새 함수를 만들어 내려보내면 memo가 무의미해진다 — 거래 자체를 넘겨 부모가 같은 함수 하나를 계속 쓰게 한다.
+  onDelete: (transaction: Transaction) => void;
   isDeleting: boolean;
 }
 
 // 왼쪽 원(카테고리 색 점) · 가운데 거래처+카테고리 · 오른쪽 금액+날짜 · 삭제 버튼의 4단 구성이다.
-export function TransactionRow({ transaction, categories, onDelete, isDeleting }: TransactionRowProps) {
+// memo: 삭제 확인창을 열거나 다른 행이 바뀌어도 이 행은 다시 그리지 않는다(목록이 15~20행이라 전부 다시 그리면 클릭 응답이 눈에 띄게 늦어진다).
+export const TransactionRow = memo(function TransactionRow({
+  transaction,
+  categories,
+  onDelete,
+  isDeleting,
+}: TransactionRowProps) {
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const hasLocation = transaction.latitude !== null && transaction.longitude !== null;
@@ -97,7 +104,7 @@ export function TransactionRow({ transaction, categories, onDelete, isDeleting }
           disabled={isDeleting}
           onClick={(event) => {
             event.stopPropagation();
-            onDelete(transaction.id);
+            onDelete(transaction);
           }}
           aria-label="삭제"
         >
@@ -120,8 +127,8 @@ export function TransactionRow({ transaction, categories, onDelete, isDeleting }
         onOpenChange={setIsEditOpen}
         transaction={transaction}
         categories={categories}
-        onDelete={() => onDelete(transaction.id)}
+        onDelete={() => onDelete(transaction)}
       />
     </>
   );
-}
+});

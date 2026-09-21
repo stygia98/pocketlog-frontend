@@ -2,7 +2,6 @@
 // 휴리스틱으로 날짜·거래처·금액·카테고리를 추정한다. 외부 API를 호출하지 않는다 — 네트워크는
 // 최초 1회 언어 데이터(kor+eng traineddata)를 받을 때만 쓰이고, 그 뒤로는 완전히 오프라인으로
 // 동작한다. 종이 영수증 사진과 카드사 앱의 결제 확인 화면(라벨-값 2열, 2자리 연도) 둘 다 다룬다.
-import { createWorker } from "tesseract.js";
 import type { ReceiptParseResult } from "@/types/receipt";
 import type { Category } from "@/types/transaction";
 
@@ -129,6 +128,8 @@ function extractCategoryName(text: string): string | null {
 // categories는 사용자가 실제로 쓰는 지출 카테고리 목록이다. 사전에서 이름을 추정해도, 그 이름의
 // 카테고리를 사용자가 지우거나 다르게 지었으면 매칭에 실패해 categoryId는 null로 남는다(정상 동작).
 export async function parseReceipt(file: File, categories: Category[]): Promise<ReceiptParseResult> {
+  // OCR 엔진은 무거워서(자바스크립트 + WASM) 화면이 열릴 때가 아니라 영수증을 실제로 첨부할 때만 불러온다.
+  const { createWorker } = await import("tesseract.js");
   const worker = await createWorker("kor+eng");
   try {
     const {

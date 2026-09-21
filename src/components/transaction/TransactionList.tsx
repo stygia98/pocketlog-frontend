@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { TransactionRow } from "@/components/transaction/TransactionRow";
@@ -28,6 +28,8 @@ export function TransactionList({ transactions, categories, onDeletedLastItem }:
   const deleteMutation = useDeleteTransactionMutation();
   const shouldReduceMotion = useReducedMotion();
   const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
+  // 모든 행이 같은 함수를 받아야 memo(TransactionRow)가 동작한다.
+  const requestDelete = useCallback((transaction: Transaction) => setDeleteTarget(transaction), []);
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return;
@@ -48,7 +50,6 @@ export function TransactionList({ transactions, categories, onDeletedLastItem }:
         {transactions.map((transaction, index) => (
           <motion.div
             key={transaction.id}
-            layout={!shouldReduceMotion}
             initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0, transition: { delay: shouldReduceMotion ? 0 : index * 0.03 } }}
             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
@@ -58,7 +59,7 @@ export function TransactionList({ transactions, categories, onDeletedLastItem }:
             <TransactionRow
               transaction={transaction}
               categories={categories}
-              onDelete={() => setDeleteTarget(transaction)}
+              onDelete={requestDelete}
               isDeleting={deleteMutation.isPending && deleteMutation.variables === transaction.id}
             />
           </motion.div>

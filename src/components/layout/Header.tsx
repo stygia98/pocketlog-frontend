@@ -31,7 +31,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           {/* 로고와 메뉴를 한 묶음으로 왼쪽에 붙인다. 오른쪽은 닉네임·테마·로그아웃 묶음이 차지한다. */}
           <div className="flex items-center gap-6">

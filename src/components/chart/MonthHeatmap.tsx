@@ -78,12 +78,13 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
             }}
           >
             {isNoSpendDay && (
-              // public/assets/no-spend-stamp.png는 원본(종이 질감 배경)에서 밝은 픽셀을 투명 처리해 둔
-              // 도장 자국만 남긴 PNG다 — 어떤 셀 배경 위에도 자연스럽게 겹쳐진다.
+              // 원본(no-spend-stamp.png, 1.1MB·종이 질감 배경)에서 밝은 픽셀을 투명 처리한 도장 자국만 320px WebP(37KB)로 줄여 쓴다.
+              // 무지출 날마다 한 장씩 그려지므로 원본을 그대로 쓰면 대시보드가 느려진다. 어떤 셀 배경 위에도 자연스럽게 겹쳐진다.
               <motion.img
-                src="/assets/no-spend-stamp.png"
+                src="/assets/no-spend-stamp-sm.webp"
                 alt=""
                 aria-hidden
+                decoding="async"
                 initial={{ opacity: 0, scale: 0.7, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: -8 }}
                 transition={{ duration: 0.2 }}

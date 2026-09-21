@@ -170,7 +170,7 @@ export function AuthShowcase() {
 
         {/* 무지출 도장: 앱에서 실제로 쓰는 그 도장을 카드 모서리에 찍는다 */}
         <motion.img
-          src="/assets/no-spend-stamp.png"
+          src="/assets/no-spend-stamp-sm.webp"
           alt=""
           className="pointer-events-none absolute -bottom-5 -left-2 w-[26%] max-w-28"
           initial={{ opacity: 0, scale: 1.6, rotate: -22 }}

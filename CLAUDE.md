@@ -10,7 +10,7 @@
 
 ```bash
 npm install --legacy-peer-deps    # shadcn/ui가 peer dependency 충돌을 일으킨다
-npm run dev                       # http://localhost:3000
+npm run dev                       # http://localhost:3000 (next dev --turbopack)
 npm run build
 npm run lint
 ```
@@ -43,6 +43,15 @@ src/
 - **금액 포맷·파싱은 `lib/money.ts`, 날짜 포맷은 `lib/date.ts`만 쓴다.** 화면에서 `toLocaleString`·`format`을 직접 부르지 않는다.
 - 서버 상태는 React Query, UI 상태만 `useState`.
 - `any` 금지. 불가피하면 `unknown` + 타입 가드.
+
+## 성능 규칙
+
+화면·클릭이 느려지는 원인은 대부분 아래 넷이었다. 새로 만들 때도 지킨다.
+
+- **`next dev`는 `--turbopack`으로 돌린다**(`package.json`의 `dev`). 개발 서버는 화면을 처음 열 때 그 화면을 컴파일하는데, webpack보다 약 2배 빠르다(로그인 11.2초 → 6.6초, 대시보드 6.4초 → 3.2초, 내역·예산·내역관리도 1.3~1.9초 → 0.7~1.6초).
+- **이미지는 표시 크기에 맞춰 줄여서 쓴다.** 무지출 도장 원본 PNG(1.1MB)를 날마다 한 장씩 그리던 것을 320px WebP(37KB)로 바꿨다. 원본은 `public/assets/`에 두되 화면에서는 `-sm` 파일을 쓴다.
+- **무거운 라이브러리는 쓰는 순간에 동적 `import()`한다.** `tesseract.js`는 영수증을 첨부할 때만 불러온다(`lib/receipts.ts`).
+- **목록의 행은 `memo`로 감싸고, 부모가 넘기는 함수는 `useCallback`으로 하나만 쓴다**(`TransactionRow`). 안 그러면 팝업 하나를 열어도 모든 행이 다시 그려진다. 목록 행에 `layout` 애니메이션을 쓰지 않는다(행마다 위치를 계속 재측정한다). `backdrop-blur`도 쓰지 않는다.
 
 ## 이 저장소에서 설치하지 않는 것
 
