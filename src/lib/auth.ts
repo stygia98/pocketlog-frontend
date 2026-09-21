@@ -14,3 +14,8 @@ export function login(body: LoginRequest): Promise<LoginResponse> {
 export function fetchMe(): Promise<User> {
   return apiClient.get<User>("/auth/me");
 }
+
+// PUT /auth/me — 갱신된 내 정보를 돌려준다(AUTH-10).
+export function updateNickname(nickname: string): Promise<User> {
+  return apiClient.put<User>("/auth/me", { nickname });
+}

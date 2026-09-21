@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { getToken, setToken, clearToken } from "@/lib/apiClient";
-import { fetchMe, login, signup } from "@/lib/auth";
+import { fetchMe, login, signup, updateNickname } from "@/lib/auth";
 import { queryKeys } from "@/lib/queryKeys";
 import type { LoginRequest, SignupRequest } from "@/types/auth";
 
@@ -64,6 +65,18 @@ export function useLoginMutation() {
 export function useSignupMutation() {
   return useMutation({
     mutationFn: (body: SignupRequest) => signup(body),
+  });
+}
+
+// 응답이 갱신된 내 정보라 다시 조회하지 않고 캐시에 바로 넣는다 — 헤더·대시보드 인사말이 함께 바뀐다.
+export function useUpdateNicknameMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (nickname: string) => updateNickname(nickname),
+    onSuccess: (user) => {
+      queryClient.setQueryData(queryKeys.auth.me(), user);
+      toast.success("닉네임을 바꿨어요");
+    },
   });
 }
 

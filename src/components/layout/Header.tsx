@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
@@ -7,6 +8,7 @@ import { FileSpreadsheet, LayoutDashboard, LogOut, Moon, Receipt, Sun, Wallet } 
 
 import { useAuth, useMeQuery } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { NicknameDialog } from "@/components/layout/NicknameDialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +27,7 @@ export function Header() {
   const reduceMotion = useReducedMotion();
   // Header는 (main) 레이아웃이 authenticated로 판정한 뒤에만 렌더되므로 항상 활성화한다.
   const { data: user } = useMeQuery(true);
+  const [isNicknameOpen, setIsNicknameOpen] = useState(false);
 
   return (
     <>
@@ -61,7 +64,18 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             {/* 이메일은 UserResponse에 있어도 여기서 참조하지 않는다 — DOM에 아예 존재하면 안 된다(AUTH-08). */}
-            {user && <span className="text-sm text-muted-foreground">{user.nickname}님</span>}
+            {user && (
+              // 누르면 닉네임 변경 팝업(AUTH-10). 이메일은 여기서도 쓰지 않는다.
+              <button
+                type="button"
+                onClick={() => setIsNicknameOpen(true)}
+                aria-label={`닉네임 변경 (현재 ${user.nickname})`}
+                title="닉네임 변경"
+                className="rounded-md px-1 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:min-h-11"
+              >
+                {user.nickname}님
+              </button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -97,6 +111,8 @@ export function Header() {
           );
         })}
       </nav>
+
+      {user && <NicknameDialog nickname={user.nickname} open={isNicknameOpen} onOpenChange={setIsNicknameOpen} />}
     </>
   );
 }
