@@ -7,7 +7,18 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: ui-monospace, monospace;
-  --font-heading: Georgia, "Times New Roman", Times, serif;
+  /* 제목도 본문과 같은 Pretendard로 통일한다(세리프 사용 안 함). font-heading 클래스는 그대로 두고 값만 맞춘다. */
+  --font-heading: var(--font-sans);
+  /* 전체 글자 크기를 Tailwind 기본값보다 3px씩 키운다. rem만 덮어쓰므로 여백·높이는 그대로다.
+     line-height 변수(--text-*--line-height)는 비율값이라 건드리지 않아도 함께 커진다. */
+  --text-xs: 0.9375rem;
+  --text-sm: 1.0625rem;
+  --text-base: 1.1875rem;
+  --text-lg: 1.3125rem;
+  --text-xl: 1.4375rem;
+  --text-2xl: 1.6875rem;
+  --text-3xl: 2.0625rem;
+  --text-4xl: 2.4375rem;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -44,9 +55,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  /* 수입/지출은 액센트 규칙의 예외로 항상 고정된 의미색이다(CLAUDE.md 8장) — 다크모드에서도 값이 바뀌지 않는다. */
+  /* 수입/지출/잔액은 액센트 규칙의 예외인 의미색이다(CLAUDE.md 8장). 다크모드 값은 :root.dark에서 따로 둔다.
+     지출은 회색이라 "경고 빨강"으로 쓰지 않는다 — 예산 초과·음수 잔액은 --destructive를 쓴다. */
   --color-income: var(--income);
   --color-expense: var(--expense);
+  --color-net: var(--net);
   /* 카테고리 색 미지정 시 순서대로 배정하는 팔레트(CLAUDE.md 8장). 라이트/다크 공통. */
   --color-category-1: #ef4444;
   --color-category-2: #f59e0b;
@@ -95,8 +108,9 @@
   --sidebar-accent-foreground: #141413;
   --sidebar-border: #dedcd1;
   --sidebar-ring: #d97757;
-  --income: #558a42;
-  --expense: #b3452f;
+  --income: #1b7a4b;
+  --expense: #4b4a45;
+  --net: #b8542f;
 }
 
 /* 다크모드 토글이 생기면서 class 전략으로 바꿨다 — prefers-color-scheme만으로는 사용자가
@@ -135,8 +149,9 @@
   --sidebar-accent-foreground: #faf9f5;
   --sidebar-border: #30302e;
   --sidebar-ring: #d97757;
-  --income: #558a42;
-  --expense: #b3452f;
+  --income: #4fb57f;
+  --expense: #b5b3aa;
+  --net: #e8926f;
 }
 
 @layer base {
@@ -144,7 +159,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-base text-foreground;
   }
   html {
     @apply font-sans;
