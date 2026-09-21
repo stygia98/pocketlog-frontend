@@ -28,7 +28,7 @@ export function Header() {
     <>
       <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/dashboard" className="font-heading text-lg font-bold">
+          <Link href="/dashboard" className="font-heading text-lg font-bold text-logo">
             포켓로그
           </Link>
 
