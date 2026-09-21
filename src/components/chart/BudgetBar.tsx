@@ -12,7 +12,8 @@ export function BudgetBar({ data }: BudgetBarProps) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <div className="flex flex-col gap-3">
+    // flex-1 + justify-between: 부모 카드가 옆 카드 높이에 맞춰 늘어나면 행들이 그 높이를 고르게 채운다.
+    <div className="flex flex-1 flex-col justify-between gap-3">
       {data.map((d) => {
         // budget === 0 분기를 반드시 둔다 — 0으로 나누면 Infinity/NaN이 화면에 실린다 (CLAUDE.md 5장).
         const ratio = d.budget > 0 ? Math.min(d.spent / d.budget, 1) : 0;
@@ -21,8 +22,16 @@ export function BudgetBar({ data }: BudgetBarProps) {
         return (
           <div key={d.name} className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-sm">
-              <span>{d.name}</span>
-              <span className={exceeded ? "text-expense font-medium" : "text-muted-foreground"}>
+              {/* 이름 옆 점은 도넛 범례와 같은 모양이다. 막대는 예산 이내면 카테고리 색, 초과하면 빨강이다. */}
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span
+                  className="inline-block h-2 w-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: d.color ?? "var(--muted-foreground)" }}
+                  aria-hidden
+                />
+                <span className="truncate">{d.name}</span>
+              </span>
+              <span className={exceeded ? "shrink-0 text-destructive font-medium" : "shrink-0 text-muted-foreground"}>
                 {d.budget > 0 ? `${Math.round(ratio * 100)}%` : "예산 미설정"}
               </span>
             </div>
@@ -33,7 +42,7 @@ export function BudgetBar({ data }: BudgetBarProps) {
                 initial={shouldReduceMotion ? false : { width: 0 }}
                 animate={{ width: `${ratio * 100}%` }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.3 }}
-                style={{ backgroundColor: exceeded ? "var(--expense)" : (d.color ?? "var(--primary)") }}
+                style={{ backgroundColor: exceeded ? "var(--destructive)" : (d.color ?? "var(--primary)") }}
               />
             </div>
           </div>

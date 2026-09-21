@@ -20,7 +20,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
       <div className="rounded-xl border border-border bg-card p-4">
         <p className="text-sm text-muted-foreground">잔액</p>
         <p
-          className={`mt-1 text-xl font-semibold tabular-nums ${summary.net < 0 ? "text-expense" : ""}`}
+          className={`mt-1 text-xl font-semibold tabular-nums ${summary.net < 0 ? "text-destructive" : "text-net"}`}
         >
           {formatAmount(summary.net)}
         </p>

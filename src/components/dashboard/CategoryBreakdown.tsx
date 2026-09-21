@@ -28,9 +28,10 @@ export function CategoryBreakdown({ byCategory }: CategoryBreakdownProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <p className="text-sm text-muted-foreground">카테고리별 지출</p>
-      <div className="mt-3 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-        <CategoryDonut data={donutData} />
-        <ul className="flex w-full min-w-0 flex-col gap-1.5">
+      {/* 도넛을 가운데(190px)에 두고, 목록은 그 아래 전체 폭으로 둔다. */}
+      <div className="mt-3 flex flex-col items-center gap-5">
+        <CategoryDonut data={donutData} size={190} strokeWidth={28} />
+        <ul className="flex w-full min-w-0 flex-col gap-2.5">
           {byCategory.map((category) => (
             <li key={category.categoryId} className="flex items-center justify-between gap-2 text-sm">
               {/* 이름 텍스트는 색 위가 아니라 점 옆에 둔다 — 사용자 지정 색이라 대비를 계산할 수 없다(PRD.md 5.1). */}

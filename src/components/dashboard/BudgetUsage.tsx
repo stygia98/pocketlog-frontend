@@ -42,9 +42,10 @@ export function BudgetUsage({ budgets }: BudgetUsageProps) {
   }));
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="flex flex-col rounded-xl border border-border bg-card p-4">
       <p className="text-sm text-muted-foreground">예산 소진율</p>
-      <div className="mt-3">
+      {/* pb-2: 마지막 항목 막대가 카드 아래 테두리에 바짝 붙지 않도록 여백을 조금 남긴다. */}
+      <div className="mt-3 flex flex-1 flex-col pb-2">
         <BudgetBar data={data} />
       </div>
     </div>

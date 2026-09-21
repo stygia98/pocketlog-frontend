@@ -76,7 +76,7 @@ export function CategoryDonut({ data, size = 160, strokeWidth = 24 }: CategoryDo
         y={size / 2}
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize="16"
+        fontSize={Math.round(size / 8)}
         fontWeight="600"
         fill="var(--color-foreground)"
       >

@@ -18,8 +18,8 @@ interface MonthHeatmapProps {
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-// 파스텔 4단계(스카이블루). 활동이 없는 날(0원/0원)은 이 배열이 아니라 흰색으로 따로 처리한다.
-const INTENSITY_COLORS = ["#EFF6FF", "#D6E9FF", "#B3D7FF", "#8AC0FF"] as const;
+// 파스텔 4단계(연두~초록). 활동이 없는 날(0원/0원)은 이 배열이 아니라 흰색으로 따로 처리한다.
+const INTENSITY_COLORS = ["#F3F9EE", "#E0F0D6", "#CBE6BA", "#B2D99B"] as const;
 
 function intensityTier(expense: number, max: number): number {
   if (expense <= 0) return 0;
@@ -73,18 +73,18 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
                 className="pointer-events-none absolute inset-0.5 size-[calc(100%-0.25rem)] object-contain"
               />
             )}
-            <span className="relative z-10 text-[11px] font-semibold leading-none text-muted-foreground sm:text-lg">
+            <span className="relative z-10 text-[13px] font-semibold leading-none text-muted-foreground sm:text-lg">
               {getDate(parseISO(d.date))}
             </span>
             {/* 수입·지출이 0원인 줄은 아예 렌더링하지 않는다 — 매일 "0원"이 두 줄씩 반복되면
                 실제 값이 있는 날이 눈에 띄지 않는다. 둘 다 0이면 날짜만 보인다. */}
             {d.income > 0 && (
-              <span className="relative z-10 truncate text-[9px] font-bold leading-tight sm:text-[15px]" style={{ color: "var(--income)" }}>
+              <span className="relative z-10 truncate text-[10px] font-medium leading-tight sm:text-[15px]" style={{ color: "var(--income)" }}>
                 {formatCompactAmount(d.income)}
               </span>
             )}
             {d.expense > 0 && (
-              <span className="relative z-10 truncate text-[9px] font-bold leading-tight sm:text-[15px]" style={{ color: "var(--expense)" }}>
+              <span className="relative z-10 truncate text-[10px] font-medium leading-tight sm:text-[15px]" style={{ color: "var(--expense)" }}>
                 {formatCompactAmount(d.expense)}
               </span>
             )}
