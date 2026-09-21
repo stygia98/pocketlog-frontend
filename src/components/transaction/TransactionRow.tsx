@@ -37,7 +37,7 @@ export function TransactionRow({ transaction, categories, onDelete, isDeleting }
         onClick={() => setIsEditOpen(true)}
         className="flex min-w-0 flex-1 flex-col gap-1 border-0 bg-transparent p-0 text-left sm:flex-row sm:items-center sm:gap-3"
       >
-        <span className="text-sm text-muted-foreground sm:w-24 sm:shrink-0">{formatDate(transaction.txnDate)}</span>
+        <span className="whitespace-nowrap text-sm text-muted-foreground tabular-nums sm:w-28 sm:shrink-0">{formatDate(transaction.txnDate)}</span>
         <span className="flex min-w-0 items-center gap-1 sm:flex-1">
           <span className="min-w-0 truncate text-sm">{transaction.merchant}</span>
           {hasLocation && (
