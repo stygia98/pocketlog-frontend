@@ -10,11 +10,11 @@ export interface NoSpendStreakStats {
   longestStreak: number;
   /** 오늘까지 끊기지 않고 이어지는 중인 연속일 (0이면 어제 또는 오늘 지출이 있었다는 뜻) */
   currentStreak: number;
+  /** 이번 주(일~토) 중 무지출이었던 날 수 */
   weeklyAchieved: number;
-  weeklyGoal: number;
+  /** 이번 주가 이번 달 안에서 차지하는 일수 — 온전한 주면 7, 월초·월말에 잘린 주면 그만큼(예: 3) */
+  weekDays: number;
 }
-
-const WEEKLY_GOAL = 3;
 
 export function computeNoSpendStreak(daily: DailyStat[], asOf: string): NoSpendStreakStats {
   const pastDays = daily.filter((d) => d.date <= asOf);
@@ -34,11 +34,11 @@ export function computeNoSpendStreak(daily: DailyStat[], asOf: string): NoSpendS
   const asOfDate = parseISO(asOf);
   const weekStart = startOfWeek(asOfDate, { weekStartsOn: 0 });
   const weekEnd = endOfWeek(asOfDate, { weekStartsOn: 0 });
-  const weeklyAchieved = pastDays.filter((d) => {
-    if (d.expense > 0) return false;
+  const thisWeek = daily.filter((d) => {
     const date = parseISO(d.date);
     return date >= weekStart && date <= weekEnd;
-  }).length;
+  });
+  const weeklyAchieved = thisWeek.filter((d) => d.date <= asOf && d.expense <= 0).length;
 
-  return { longestStreak, currentStreak, weeklyAchieved, weeklyGoal: WEEKLY_GOAL };
+  return { longestStreak, currentStreak, weeklyAchieved, weekDays: thisWeek.length };
 }

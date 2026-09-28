@@ -11,7 +11,9 @@ interface NoSpendStreakCardProps {
 export function NoSpendStreakCard({ daily, asOf, isPastMonth }: NoSpendStreakCardProps) {
   if (isPastMonth) return null;
 
-  const { longestStreak, currentStreak, weeklyAchieved, weeklyGoal } = computeNoSpendStreak(daily, asOf);
+  const { longestStreak, currentStreak, weeklyAchieved, weekDays } = computeNoSpendStreak(daily, asOf);
+  // 미래 달을 보는 중이면 오늘이 속한 주가 daily에 없다 — "0/0일"을 그리지 않는다.
+  if (weekDays === 0) return null;
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -28,13 +30,13 @@ export function NoSpendStreakCard({ daily, asOf, isPastMonth }: NoSpendStreakCar
 
       <div className="mt-3">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>이번 주 목표</span>
+          <span>이번 주 무지출</span>
           <span className="tabular-nums">
-            {weeklyAchieved}/{weeklyGoal}일
+            {weeklyAchieved}/{weekDays}일
           </span>
         </div>
         <div className="mt-1.5 flex gap-1">
-          {Array.from({ length: Math.max(weeklyGoal, weeklyAchieved) }).map((_, index) => (
+          {Array.from({ length: weekDays }).map((_, index) => (
             <div
               key={index}
               className="h-1.5 flex-1 rounded-full"
