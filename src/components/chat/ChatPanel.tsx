@@ -29,6 +29,11 @@ const WELCOME: ChatMessage = {
 
 const CHECKING_MESSAGE: ChatMessage = { id: "checking", role: "bot", lines: ["확인하고 있어요..."] };
 
+// 메시지 id는 React key로만 쓴다. crypto.randomUUID()는 보안 컨텍스트(HTTPS·localhost) 전용이라
+// http://192.168.x.x 같은 LAN 주소로 접속하면 undefined여서 질문을 보내는 순간 TypeError가 났다.
+let messageSeq = 0;
+const nextMessageId = () => `msg-${++messageSeq}`;
+
 // 의도별로 답하기 전에 준비돼 있어야 하는 조회. 값이 현재 상태와 다르면 상태를 바꿔 다시 불러온다.
 interface Needs {
   yearMonth?: string;
@@ -87,6 +92,15 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   const [listFilters, setListFilters] = useState<TransactionListParams>(DEFAULT_LIST_FILTERS);
   const [pendingIntent, setPendingIntent] = useState<ChatIntent | null>(null);
 
+  // 새 메시지(질문·대기 문구·답변)가 붙을 때마다 대화 영역을 맨 아래로 내린다.
+  const messagesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = messagesRef.current;
+    if (!el) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ top: el.scrollHeight, behavior: reduceMotion ? "auto" : "smooth" });
+  }, [messages]);
+
   const asOf = todayString();
 
   const categoriesQuery = useCategoriesQuery();
@@ -131,7 +145,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
     }
     setMessages((prev) => [
       ...prev.slice(0, -1), // "확인하고 있어요..." 자리를 실제 답으로 교체
-      { id: crypto.randomUUID(), role: "bot", lines: answer(pendingIntent) },
+      { id: nextMessageId(), role: "bot", lines: answer(pendingIntent) },
     ]);
     setPendingIntent(null);
     // answer/hasFailed는 아래 쿼리 상태에서 파생되므로 그 상태들만 의존성으로 둔다.
@@ -154,7 +168,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
     if (!text || pendingIntent) return;
 
     const intent = parseIntent(text, categoriesQuery.data ?? [], currentYearMonth);
-    const userMessage: ChatMessage = { id: crypto.randomUUID(), role: "user", lines: [text] };
+    const userMessage: ChatMessage = { id: nextMessageId(), role: "user", lines: [text] };
     const needs = needsOf(intent);
 
     // 지금 들고 있는 조회로 답할 수 없으면 상태를 바꿔 다시 불러오고, 그동안 대기 메시지를 띄운다.
@@ -178,7 +192,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       setMessages((prev) => [...prev, userMessage, CHECKING_MESSAGE]);
       return;
     }
-    setMessages((prev) => [...prev, userMessage, { id: crypto.randomUUID(), role: "bot", lines: answer(intent) }]);
+    setMessages((prev) => [...prev, userMessage, { id: nextMessageId(), role: "bot", lines: answer(intent) }]);
   };
 
   // 좌상단 핸들 드래그로 크기를 바꾼다. 브라우저 기본 `resize`는 우하단 핸들만 지원해 직접 구현한다.
@@ -241,7 +255,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
         </button>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
+      <div ref={messagesRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {messages.map((message) => (
           <div key={message.id} className={message.role === "user" ? "text-right" : "text-left"}>
             <div
