@@ -60,7 +60,7 @@
   --color-income: var(--income);
   --color-expense: var(--expense);
   --color-net: var(--net);
-  /* 로고(포켓로그 타이틀) 전용 색. 페이지 아이보리·Clay와 같은 웜톤 딥 브라운. */
+  /* 로고(포켓로그 타이틀) 전용 색. 액센트 보라와 같은 계열의 딥 바이올렛. */
   --color-logo: var(--logo);
   /* 카테고리 색 미지정 시 순서대로 배정하는 팔레트(CLAUDE.md 8장). 라이트/다크 공통. */
   --color-category-1: #ef4444;
@@ -74,46 +74,53 @@
   --color-category-9: #737373;
 }
 
-/* Anthropic 브랜드 팔레트(Ivory/Slate/Clay)로 재매핑. shadcn이 만든 토큰 이름(--primary 등)은
+/* 라벤더 팔레트(연보라 배경·바이올렛 액센트)로 재매핑. shadcn이 만든 토큰 이름(--primary 등)은
    컴포넌트가 그대로 참조하므로 유지하고 값만 바꾼다. --sidebar-*는 이 프로젝트가 사이드바 셸을
    쓰지 않아(상단 헤더) 실제로 참조되지 않는 예비 토큰이라 메인 팔레트를 그대로 미러링한다. */
 :root {
-  --background: #faf9f5;
-  --foreground: #141413;
+  --background: #f8f7fc;
+  --foreground: #1c1a26;
   --card: #ffffff;
-  --card-foreground: #141413;
+  --card-foreground: #1c1a26;
   --popover: #ffffff;
-  --popover-foreground: #141413;
-  --primary: #b8542f;
+  --popover-foreground: #1c1a26;
+  --primary: #7556c9;
   --primary-foreground: #ffffff;
-  --secondary: #f0eee6;
-  --secondary-foreground: #141413;
-  --muted: #f0eee6;
-  --muted-foreground: #73726c;
-  --accent: #f0eee6;
-  --accent-foreground: #141413;
-  --destructive: #b3452f;
-  --border: #dedcd1;
-  --input: #dedcd1;
-  --ring: #b8542f;
-  --chart-1: #d97757;
+  --secondary: #efecf8;
+  --secondary-foreground: #1c1a26;
+  --muted: #efecf8;
+  --muted-foreground: #6e6a80;
+  --accent: #efecf8;
+  --accent-foreground: #1c1a26;
+  --destructive: #c0394b;
+  --border: #e0dcef;
+  --input: #e0dcef;
+  --ring: #7556c9;
+  --chart-1: #9b87e0;
   --chart-2: #558a42;
   --chart-3: #6a9bcc;
   --chart-4: #6b4d9e;
   --chart-5: #a64d87;
   --radius: 0.625rem;
-  --sidebar: #faf9f5;
-  --sidebar-foreground: #141413;
-  --sidebar-primary: #d97757;
+  --sidebar: #f8f7fc;
+  --sidebar-foreground: #1c1a26;
+  --sidebar-primary: #7556c9;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f0eee6;
-  --sidebar-accent-foreground: #141413;
-  --sidebar-border: #dedcd1;
-  --sidebar-ring: #d97757;
+  --sidebar-accent: #efecf8;
+  --sidebar-accent-foreground: #1c1a26;
+  --sidebar-border: #e0dcef;
+  --sidebar-ring: #7556c9;
   --income: #166c40;
-  --expense: #4b4a45;
-  --net: #b8542f;
-  --logo: #5c3d2e;
+  --expense: #4a4858;
+  --net: #7556c9;
+  --logo: #4b3a8c;
+  /* 일별 히트맵 칸 배경(0=거래 없음, 1~4=지출 농도, 라벤더). MonthHeatmap이 쓴다.
+     4단계는 수입 글자(#166c40)가 AA 4.5:1을 넘는 한계까지만 진하게 잡았다. */
+  --heat-0: #ffffff;
+  --heat-1: #f3f0fc;
+  --heat-2: #e9e4fa;
+  --heat-3: #e1daf8;
+  --heat-4: #dcd4f6;
 }
 
 /* 다크모드 토글이 생기면서 class 전략으로 바꿨다 — prefers-color-scheme만으로는 사용자가
@@ -121,41 +128,47 @@
    스크립트(하이드레이션 전에 동기 실행)가 저장된 선택값(없으면 시스템 선호)을 기준으로
    <html>에 .dark를 미리 붙여 막는다 — 자세한 내용은 layout.tsx 주석 참조. */
 :root.dark {
-  --background: #1a1918;
-  --foreground: #faf9f5;
-  --card: #1f1e1d;
-  --card-foreground: #faf9f5;
-  --popover: #1f1e1d;
-  --popover-foreground: #faf9f5;
-  --primary: #d97757;
-  --primary-foreground: #141413;
-  --secondary: #262624;
-  --secondary-foreground: #faf9f5;
-  --muted: #262624;
-  --muted-foreground: #9c9a92;
-  --accent: #262624;
-  --accent-foreground: #faf9f5;
-  --destructive: #d4735c;
-  --border: #30302e;
-  --input: #30302e;
-  --ring: #d97757;
-  --chart-1: #d97757;
+  --background: #17161d;
+  --foreground: #f6f4fc;
+  --card: #1e1c26;
+  --card-foreground: #f6f4fc;
+  --popover: #1e1c26;
+  --popover-foreground: #f6f4fc;
+  --primary: #b9a6f2;
+  --primary-foreground: #17161d;
+  --secondary: #282634;
+  --secondary-foreground: #f6f4fc;
+  --muted: #282634;
+  --muted-foreground: #9d99ae;
+  --accent: #282634;
+  --accent-foreground: #f6f4fc;
+  --destructive: #e0707f;
+  --border: #33303f;
+  --input: #33303f;
+  --ring: #b9a6f2;
+  --chart-1: #b9a6f2;
   --chart-2: #558a42;
   --chart-3: #6a9bcc;
   --chart-4: #6b4d9e;
   --chart-5: #a64d87;
-  --sidebar: #1a1918;
-  --sidebar-foreground: #faf9f5;
-  --sidebar-primary: #d97757;
+  --sidebar: #17161d;
+  --sidebar-foreground: #f6f4fc;
+  --sidebar-primary: #b9a6f2;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #262624;
-  --sidebar-accent-foreground: #faf9f5;
-  --sidebar-border: #30302e;
-  --sidebar-ring: #d97757;
+  --sidebar-accent: #282634;
+  --sidebar-accent-foreground: #f6f4fc;
+  --sidebar-border: #33303f;
+  --sidebar-ring: #b9a6f2;
   --income: #4fb57f;
-  --expense: #b5b3aa;
-  --net: #e8926f;
-  --logo: #e0b89f;
+  --expense: #b3b0c2;
+  --net: #c8b8f5;
+  --logo: #cbbdf5;
+  /* 다크: 가장 진한 4단계 위에서도 수입 글자(#4fb57f)가 AA 4.5:1을 넘도록 어둡게 잡는다. */
+  --heat-0: #1e1c26;
+  --heat-1: #221f2e;
+  --heat-2: #28243a;
+  --heat-3: #2e2946;
+  --heat-4: #352f52;
 }
 
 @layer base {
@@ -164,7 +177,7 @@
   }
   body {
     @apply bg-background text-base text-foreground;
-    /* 화면 위쪽 모서리에만 은은하게 번지는 웜 톤 빛(Clay·수입 그린). 스크롤하면 사라지는 분위기용 배경이다. */
+    /* 화면 위쪽 모서리에만 은은하게 번지는 라벤더 톤 빛(액센트 보라·수입 그린). 스크롤하면 사라지는 분위기용 배경이다. */
     background-image:
       radial-gradient(60rem 26rem at 100% -6%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 70%),
       radial-gradient(44rem 22rem at -8% 0%, color-mix(in oklab, var(--income) 7%, transparent), transparent 70%);

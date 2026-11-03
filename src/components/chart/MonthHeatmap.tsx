@@ -18,12 +18,11 @@ interface MonthHeatmapProps {
 
 const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-// 파스텔 4단계(연두~초록). 활동이 없는 날(0원/0원)은 이 배열이 아니라 흰색으로 따로 처리한다.
-const INTENSITY_COLORS = ["#F3F9EE", "#E6F3DD", "#D6ECC8", "#C8E4B4"] as const;
+// 칸 배경 0~4단계(0=지출 없음). 값은 globals.css의 --heat-*가 라이트/다크별로 정한다.
+const HEAT_COLORS = ["var(--heat-0)", "var(--heat-1)", "var(--heat-2)", "var(--heat-3)", "var(--heat-4)"] as const;
 
-// 셀 배경은 다크 모드에서도 밝은 색이라 글자색은 테마 토큰(--income 등)이 아니라 고정 진한 색을 쓴다.
-// 가장 진한 4단계 배경 위에서도 WCAG AA(4.5:1)를 넘는 값이다.
-const INK = { date: "#3F3E3A", income: "#166C40", expense: "#4B4A45" } as const;
+// 글자색은 테마 토큰을 그대로 쓴다. --heat-*가 각 모드에서 이 토큰과 AA(4.5:1) 대비를 맞추도록 잡혀 있다.
+const INK = { date: "var(--foreground)", income: "var(--income)", expense: "var(--expense)" } as const;
 
 function intensityTier(expense: number, max: number): number {
   if (expense <= 0) return 0;
@@ -37,7 +36,7 @@ function intensityTier(expense: number, max: number): number {
 // 이전·다음 달 날짜 칸. 데이터가 없는 자리를 채워 달력 모양을 맞추기만 하므로 옅게 보이고 누를 수 없다.
 function OutsideDay({ day }: { day: number }) {
   return (
-    <div aria-hidden className="aspect-square rounded-sm border border-border bg-white p-1 opacity-40">
+    <div aria-hidden className="aspect-square rounded-sm border border-border p-1 opacity-40" style={{ backgroundColor: HEAT_COLORS[0] }}>
       <span className="text-[13px] font-semibold leading-none sm:text-lg" style={{ color: INK.date }}>
         {day}
       </span>
@@ -74,21 +73,19 @@ export function MonthHeatmap({ data, onSelectDate, asOf }: MonthHeatmapProps) {
             aria-label={`${d.date}: 수입 ${formatCompactAmount(d.income)} · 지출 ${formatCompactAmount(d.expense)}${isNoSpendDay ? " · 무지출 달성" : ""}`}
             className="relative flex aspect-square cursor-pointer flex-col gap-0.5 rounded-sm border border-border p-1 text-left transition-opacity hover:opacity-80"
             style={{
-              backgroundColor: tier === 0 ? "#ffffff" : INTENSITY_COLORS[tier - 1],
+              backgroundColor: HEAT_COLORS[tier],
             }}
           >
             {isNoSpendDay && (
               // 원본(no-spend-stamp.png, 1.1MB·종이 질감 배경)에서 밝은 픽셀을 투명 처리한 도장 자국만 320px WebP(37KB)로 줄여 쓴다.
-              // 무지출 날마다 한 장씩 그려지므로 원본을 그대로 쓰면 대시보드가 느려진다. 어떤 셀 배경 위에도 자연스럽게 겹쳐진다.
-              <motion.img
-                src="/assets/no-spend-stamp-sm.webp"
-                alt=""
+              // 무지출 날마다 한 장씩 그려지므로 원본을 그대로 쓰면 대시보드가 느려진다.
+              // 이미지의 초록은 쓰지 않고 알파(모양)만 마스크로 따서 --primary로 칠한다 — 테마·다크 모드를 그대로 따른다.
+              <motion.span
                 aria-hidden
-                decoding="async"
                 initial={{ opacity: 0, scale: 0.7, rotate: -10 }}
                 animate={{ opacity: 1, scale: 1, rotate: -8 }}
                 transition={{ duration: 0.2 }}
-                className="pointer-events-none absolute inset-0.5 size-[calc(100%-0.25rem)] object-contain"
+                className="pointer-events-none absolute inset-0.5 bg-primary [mask:url(/assets/no-spend-stamp-sm.webp)_center/contain_no-repeat]"
               />
             )}
             <span className="relative z-10 text-[13px] font-semibold leading-none sm:text-lg" style={{ color: INK.date }}>
